@@ -7,17 +7,24 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // 🟢 Вхід через Google
 export const signInWithGoogle = async () => {
+  const redirectTo =
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5173/dashboard"
+      : "https://corporate-portal-rho.vercel.app/dashboard";
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "http://localhost:5173/dashboard",
+      redirectTo,
     },
   });
 
   if (error) {
-    console.error("Помилка входу через Google:", error);
+    console.error("❌ Помилка авторизації:", error);
+    alert("❌ Помилка входу: " + error.message);
   }
 };
+
 
 // 🔵 Отримати поточного користувача
 export const getCurrentUser = async () => {
