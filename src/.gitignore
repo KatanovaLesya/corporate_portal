@@ -1,0 +1,18 @@
+# ⚠️ Чутливі дані та середовище
+.env
+.env.local
+.env.development
+.env.production
+
+# 📦 Node.js файли та кеші
+node_modules/
+npm-debug.log
+yarn.lock
+package-lock.json
+
+# ⚛️ Build файли
+dist/
+build/
+.vscode/
+.DS_Store
+.idea/
