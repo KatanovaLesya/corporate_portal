@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { supabase } from "../supabaseClient";
 import { signInWithGoogle } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import styles from "./Home.module.css"
 
 const Home = () => {
   const navigate = useNavigate();
@@ -42,11 +43,11 @@ const Home = () => {
   }, [navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold">Corporate Portal</h1>
+    <div className={styles.container}>
+      <h1 className={styles.title}>Corporate Portal</h1>
       <p>Sign in to access your dashboard.</p>
       <button
-        className="px-4 py-2 mt-4 text-white bg-blue-500 rounded hover:bg-blue-600"
+        className={styles.button}
         onClick={signInWithGoogle}
       >
         Sign in with Google
