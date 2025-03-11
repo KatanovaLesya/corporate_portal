@@ -1,9 +1,7 @@
 
 import { useEffect } from "react";
-
-import { supabase } from '../supabaseClient';
-import { signInWithGoogle } from '../services/authService';
-
+import { supabase } from "../supabaseClient";
+import { signInWithGoogle } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
@@ -12,25 +10,35 @@ const Home = () => {
   useEffect(() => {
     const checkAuthState = async () => {
       console.log("🔄 Оновлення сесії перед перевіркою...");
-      await supabase.auth.refreshSession(); // 🔥 Примусово оновлюємо сесію
+      
+      // Оновлюємо сесію та чекаємо завершення процесу
+      const { data: refreshedSession, error } = await supabase.auth.refreshSession();
+      if (error) console.error("❌ Помилка оновлення сесії:", error.message);
+      
+      console.log("🟢 Сесія після оновлення:", refreshedSession);
 
       const { data: { session } } = await supabase.auth.getSession();
-      console.log("🟢 Перевірка сесії після оновлення:", session);
       if (session) {
+        console.log("✅ Користувач знайдений, редірект на /dashboard");
         navigate("/dashboard");
       }
     };
 
     checkAuthState();
 
+    // Створюємо слухача змін сесії
     const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(`🔄 Auth state changed: ${event}`, session);
+      console.log(`🔄 Зміна стану авторизації: ${event}`, session);
       if (session) {
+        console.log("✅ Сесія активна, редіректимо на /dashboard...");
         navigate("/dashboard");
       }
     });
 
-    return () => listener?.subscription.unsubscribe();
+    return () => {
+      listener?.subscription.unsubscribe();
+      console.log("📴 Слухач авторизації відключений");
+    };
   }, [navigate]);
 
   return (
@@ -48,4 +56,3 @@ const Home = () => {
 };
 
 export default Home;
-

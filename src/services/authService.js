@@ -16,8 +16,8 @@ export const signInWithGoogle = async () => {
   try {
     const redirectTo =
       import.meta.env.MODE === "development"
-        ? "http://localhost:5173/dashboard"
-        : "https://corporate-portal-rho.vercel.app/dashboard";
+        ? "http://localhost:5173/"
+        : "https://corporate-portal-rho.vercel.app/";
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
