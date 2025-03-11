@@ -1,42 +1,55 @@
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from '../supabaseClient'; // ✅ Використовуємо існуючий supabase
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const getCurrentUser = async () => {
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (error) throw error;
+    console.log("🟢 Успішно отримано користувача:", data.user);
+    return data.user;
+  } catch (error) {
+    console.error("❌ Помилка отримання користувача:", error.message);
+    return null;
+  }
+};
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// 🟢 Вхід через Google
 export const signInWithGoogle = async () => {
-  const redirectTo =
-    import.meta.env.MODE === "development"
-      ? "http://localhost:5173/dashboard"
-      : "https://corporate-portal-rho.vercel.app/dashboard";
+  try {
+    const redirectTo =
+      import.meta.env.MODE === "development"
+        ? "http://localhost:5173/dashboard"
+        : "https://corporate-portal-rho.vercel.app/dashboard";
 
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
-    options: {
-      redirectTo,
-    },
-  });
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo },
+    });
 
-  if (error) {
-    console.error("❌ Помилка авторизації:", error);
+    if (error) throw error;
+    console.log("🟢 Авторизація через Google успішна");
+  } catch (error) {
+    console.error("❌ Помилка авторизації:", error.message);
     alert("❌ Помилка входу: " + error.message);
   }
 };
 
-
-// 🔵 Отримати поточного користувача
-export const getCurrentUser = async () => {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) {
-    console.error("Помилка отримання користувача:", error);
-    return null;
+export const signOut = async () => {
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    console.log("🔴 Користувач вийшов");
+  } catch (error) {
+    console.error("❌ Помилка виходу:", error.message);
   }
-  return data.user;
 };
 
-// 🔴 Вийти з аккаунту
-export const signOut = async () => {
-  await supabase.auth.signOut();
+export const refreshSession = async () => {
+  try {
+    const { data, error } = await supabase.auth.refreshSession();
+    if (error) throw error;
+    console.log("🟢 Сесію оновлено успішно", data);
+    return data;
+  } catch (error) {
+    console.error("❌ Помилка оновлення сесії:", error.message);
+    return null;
+  }
 };
