@@ -56,3 +56,13 @@ export const refreshSession = async () => {
     return null;
   }
 };
+
+// 🟢 ВАЖЛИВО: Відслідковування зміни сесії
+supabase.auth.onAuthStateChange((event, session) => {
+  console.log("🪪 Зміна стану авторизації:", event, session);
+  if (session) {
+    localStorage.setItem("supabase.auth.token", JSON.stringify(session));
+  } else {
+    localStorage.removeItem("supabase.auth.token");
+  }
+});
