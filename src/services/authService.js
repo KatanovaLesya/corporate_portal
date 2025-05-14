@@ -1,5 +1,6 @@
 import { supabase } from "../supabaseClient";
 
+//Отримуємо поточного авторизованого користувача
 export const getCurrentUser = async () => {
   try {
     const { data, error } = await supabase.auth.getUser();
@@ -57,7 +58,7 @@ export const refreshSession = async () => {
   }
 };
 
-// 🟢 ВАЖЛИВО: Відслідковування зміни сесії
+// Відслідковування зміни сесії
 supabase.auth.onAuthStateChange((event, session) => {
   console.log("🪪 Зміна стану авторизації:", event, session);
   if (session) {
