@@ -1,54 +1,46 @@
 
-import { useEffect } from "react";
-import { supabase } from "../supabaseClient";
-import { signInWithGoogle } from "../services/authService";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getCurrentUser } from "../services/authService";
 import styles from "./Home.module.css";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    const checkAuthState = async () => {
-      console.log("🔄 Оновлення сесії перед перевіркою...");
-      
-      const { data: initialSession } = await supabase.auth.getSession();
-      console.log("📌 Початкова сесія:", initialSession);
+    // 1. Зберігаємо токен, якщо прийшли після Google OAuth
+  const urlParams = new URLSearchParams(window.location.search);
+  const token = urlParams.get("token");
+  if (token) {
+    localStorage.setItem("token", token);
+    // Прибрати токен із URL, щоб не дублікувався при рефреші:
+    window.history.replaceState({}, document.title, "/");
+  }
 
-      // Оновлюємо сесію та перевіряємо помилки
-      const { data: refreshedSession, error } = await supabase.auth.refreshSession();
-      if (error) {
-        console.error("❌ Помилка оновлення сесії:", error.message);
-      } else {
-        console.log("🟢 Сесія успішно оновлена:", refreshedSession);
+  // 2. Перевіряємо user 
+    const checkUser = async () => {
+      const user = await getCurrentUser();
+      if (user) {
+        if (!user.roles || user.roles.length === 0 || (user.roles.length === 1 && user.roles[0] === "guest")) {
+          navigate("/no-access");
+        } else {
+          navigate("/dashboard");
+        }
+
+        return;
       }
-
-      // Отримуємо оновлену сесію
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log("🟢 Сесія після оновлення:", session);
-
-      if (session) {
-        console.log("✅ Користувач знайдений, редірект на /dashboard");
-        navigate("/dashboard");
-      }
+      setChecking(false);
     };
-
-    checkAuthState();
-
-    // Створюємо слухача змін сесії
-    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log(`🔄 Зміна стану авторизації: ${event}`, session);
-      if (session) {
-        console.log("✅ Сесія активна, редіректимо на /dashboard...");
-        navigate("/dashboard");
-      }
-    });
-
-    return () => {
-      listener?.subscription.unsubscribe();
-      console.log("📴 Слухач авторизації відключений");
-    };
+    checkUser();
   }, [navigate]);
+
+  const signInWithGoogle = () => {
+    window.location.href = "https://back-corp-portal.onrender.com/api/auth/google";
+  };
+
+  if (checking) return <div>Завантаження...</div>;
+
 
   return (
     <div className={styles.container}>

@@ -2,22 +2,21 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NoAccess from "./components/NoAccess"; 
 
 const AppRoutes = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        {/* Додати перенаправлення для 404 */}
-        <Route path="*" element={<Home />} />
+
+        {/* Всі захищені сторінки всередині ProtectedRoute */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
+
+        {/* 404, або сторінка без доступу */}
+        <Route path="/no-access" element={<NoAccess />} />
       </Routes>
     </Router>
   );

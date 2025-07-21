@@ -1,69 +1,24 @@
-import { supabase } from "../supabaseClient";
+import api from "./api";
 
-//Отримуємо поточного авторизованого користувача
+// Отримати поточного користувача
 export const getCurrentUser = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return null;
   try {
-    const { data, error } = await supabase.auth.getUser();
-    if (error) throw error;
-    console.log("🟢 Успішно отримано користувача:", data.user);
-    return data.user;
-  } catch (error) {
-    console.error("❌ Помилка отримання користувача:", error.message);
-    return null;
-  }
-};
-
-export const signInWithGoogle = async () => {
-  try {
-    const isLocalhost = window.location.hostname === "localhost";
-    const redirectTo = isLocalhost
-      ? "http://localhost:5173/dashboard"
-      : "https://corporate-portal-rho.vercel.app/dashboard";
-
-    console.log(`🔄 Авторизація через Google, редірект на: ${redirectTo}`);
-
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo },
+    const res = await api.get("/users/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
-
-    if (error) throw error;
-    console.log("🟢 Авторизація через Google успішна");
-  } catch (error) {
-    console.error("❌ Помилка авторизації:", error.message);
-    alert("❌ Помилка входу: " + error.message);
-  }
-};
-
-export const signOut = async () => {
-  try {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-    console.log("🔴 Користувач вийшов");
-  } catch (error) {
-    console.error("❌ Помилка виходу:", error.message);
-  }
-};
-
-export const refreshSession = async () => {
-  try {
-    console.log("🔄 Оновлення сесії...");
-    const { data, error } = await supabase.auth.refreshSession();
-    if (error) throw error;
-    console.log("🟢 Сесію оновлено успішно", data);
-    return data;
-  } catch (error) {
-    console.error("❌ Помилка оновлення сесії:", error.message);
+    console.log("USER FROM API:", res.data);
+    return res.data;
+  } catch (err) {
+    console.log("ERROR getCurrentUser:", err);
     return null;
   }
 };
 
-// Відслідковування зміни сесії
-supabase.auth.onAuthStateChange((event, session) => {
-  console.log("🪪 Зміна стану авторизації:", event, session);
-  if (session) {
-    localStorage.setItem("supabase.auth.token", JSON.stringify(session));
-  } else {
-    localStorage.removeItem("supabase.auth.token");
-  }
-});
+// Вийти (logout)
+export const signOut = () => {
+  localStorage.removeItem("token");
+};
