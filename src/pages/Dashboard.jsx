@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, signOut } from "../services/authService";
+import styles from "./Dashboard.module.css"; 
+import AdminPanel from "../components/AdminPanel";;
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -30,27 +32,22 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p>Вітаю, {user.email}</p>
-      <p className="mt-2">
-        <strong>Ваші ролі:</strong>{" "}
-        {user.roles?.length > 0 ? user.roles.join(", ") : "Немає ролей"}
-      </p>
-
-      {user.roles?.includes("admin") && (
-        <div className="mt-4 p-4 bg-gray-200 rounded">
-          <h2 className="text-lg font-semibold">🔑 Панель адміністратора</h2>
-          <p>Тут буде функціонал для керування користувачами.</p>
+    <div className="relative min-h-screen flex flex-col items-center justify-center">
+      {/* USER INFO TOP RIGHT */}
+      <div className={styles["user-info-top-right"]}>
+        <img src={user.avatarURL} alt={user.name} className={styles["user-info__avatar"]} />
+        <div>
+          <span className={styles["user-info__name"]}>{user.name}</span>
+          <div className={styles["user-info__email"]}>{user.email}</div>
+          <div className={styles["user-info__roles"]}>{user.roles && user.roles.length > 0 ? user.roles.join(", ") : "Немає ролей"}</div>
         </div>
-      )}
-
-      <button
-        className="px-4 py-2 mt-4 text-white bg-red-500 rounded hover:bg-red-600"
-        onClick={handleLogout}
-      >
-        Вийти
-      </button>
+        <button className={styles["logout-btn"]} onClick={handleLogout}>LOG OUT</button>
+      </div>
+      {user.roles && user.roles.includes("admin") && (
+  <AdminPanel />
+)}
+      
+      
     </div>
   );
 };

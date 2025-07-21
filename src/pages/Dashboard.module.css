@@ -1,0 +1,49 @@
+.user-info-top-right {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    padding: 6px 16px;
+    border-radius: 32px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.user-info__avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #e5e5e5;
+}
+
+.user-info__roles {
+    font-size: 0.95rem;
+    color: #555;
+    margin-top: 2px;
+}
+
+.logout-btn {
+    margin-left: 16px;
+    padding: 6px 16px;
+    background: #f44336;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    background: #d32f2f;
+}
+
+.user-info__name {
+    font-weight: 600;
+    margin-right: 8px;
+}
+
+.user-info__email {
+    color: #888;
+    font-size: 0.95em;
+}
