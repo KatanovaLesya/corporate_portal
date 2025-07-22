@@ -1,30 +1,21 @@
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "../services/authService";
 import styles from "./Dashboard.module.css";
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Замініть URL на свій API!
-    fetch("/api/profile", { credentials: "include" })
-      .then((res) => {
-        if (!res.ok) throw new Error("Не вдалося отримати профіль");
-        return res.json();
-      })
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || "Помилка");
-        setLoading(false);
-      });
+    const fetchUser = async () => {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    };
+    fetchUser();
   }, []);
 
   if (loading) return <div>Завантаження...</div>;
-  if (error) return <div>Помилка: {error}</div>;
   if (!user) return <div>Профіль не знайдено</div>;
 
   return (
