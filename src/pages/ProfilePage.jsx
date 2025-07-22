@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from "react";
-import { getCurrentUser } from "../services/authService";
+import { getCurrentUser, patchProfile, uploadAvatar } from "../services/authService";
 import styles from "./Dashboard.module.css";
 import PropTypes from "prop-types";
 
 const PencilIcon = ({ size = 16 }) => (
-    <svg width={size} height={size} fill="gray" viewBox="0 0 20 20">
-        <path d="M13.586 3.586a2 2 0 0 1 2.828 2.828l-9.193 9.193a1 1 0 0 1-.293.207l-3 1.5a1 1 0 0 1-1.316-1.316l1.5-3a1 1 0 0 1 .207-.293l9.193-9.193zm2.121-2.121a4 4 0 0 0-5.656 0L3.879 7.636A3 3 0 0 0 3 9.758l-1.5 3A3 3 0 0 0 6.242 18.5l3-1.5a3 3 0 0 0 2.122-.879l6.172-6.172a4 4 0 0 0 0-5.656z"/>
-    </svg>
+  <svg width={size} height={size} fill="gray" viewBox="0 0 20 20">
+    <path d="M13.586 3.586a2 2 0 0 1 2.828 2.828l-9.193 9.193a1 1 0 0 1-.293.207l-3 1.5a1 1 0 0 1-1.316-1.316l1.5-3a1 1 0 0 1 .207-.293l9.193-9.193zm2.121-2.121a4 4 0 0 0-5.656 0L3.879 7.636A3 3 0 0 0 3 9.758l-1.5 3A3 3 0 0 0 6.242 18.5l3-1.5a3 3 0 0 0 2.122-.879l6.172-6.172a4 4 0 0 0 0-5.656z"/>
+  </svg>
 );
 PencilIcon.propTypes = {
   size: PropTypes.number,
@@ -46,47 +46,22 @@ const ProfilePage = () => {
   };
 
   const saveTelegram = async () => {
-    const token = localStorage.getItem("token");
-    await fetch("/api/users/me", {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ telegram }),
-    });
+    await patchProfile({ telegram });
     const currentUser = await getCurrentUser();
     setUser(currentUser);
     setEditTelegram(false);
   };
 
   const savePhone = async () => {
-    const token = localStorage.getItem("token");
-    await fetch("/api/users/me", {
-      method: "PATCH",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ phone }),
-    });
+    await patchProfile({ phone });
     const currentUser = await getCurrentUser();
     setUser(currentUser);
     setEditPhone(false);
   };
 
   const saveAvatar = async () => {
-    const token = localStorage.getItem("token");
     if (avatarFile) {
-      const fd = new FormData();
-      fd.append("avatar", avatarFile);
-      await fetch("/api/users/me/avatar", {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-        body: fd,
-      });
+      await uploadAvatar(avatarFile);
       const currentUser = await getCurrentUser();
       setUser(currentUser);
       setEditAvatar(false);
