@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, signOut } from "../services/authService";
 import styles from "./Dashboard.module.css"; 
-import AdminPanel from "../components/AdminPanel";;
+import AdminPanel from "../components/AdminPanel";
+import { modules } from "../config/modulesConfig";
+import { Link } from "react-router-dom";
+import UserInfo from "../components/UserInfo";
+
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
@@ -33,16 +37,21 @@ const Dashboard = () => {
 
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center">
-      {/* USER INFO TOP RIGHT */}
-      <div className={styles["user-info-top-right"]}>
-        <img src={user.avatarURL} alt={user.name} className={styles["user-info__avatar"]} />
-        <div>
-          <span className={styles["user-info__name"]}>{user.name}</span>
-          <div className={styles["user-info__email"]}>{user.email}</div>
-          <div className={styles["user-info__roles"]}>{user.roles && user.roles.length > 0 ? user.roles.join(", ") : "Немає ролей"}</div>
+      <UserInfo user={user} onLogout={handleLogout} />
+      <div className={styles.modulesSection}>
+          <h2>Мої модулі</h2>
+          <div className={styles.modulesGrid}>
+            {modules
+              .filter(m => user.roles.some(role => m.roles.includes(role)))
+              .map(m => (
+                <Link to={m.path} key={m.path} className={styles.moduleTile}>
+                  <span className={styles.moduleIcon}>{m.icon}</span>
+                  <span>{m.name}</span>
+                </Link>
+              ))}
+          </div>
         </div>
-        <button className={styles["logout-btn"]} onClick={handleLogout}>LOG OUT</button>
-      </div>
+
       {user.roles && user.roles.includes("admin") && (
   <AdminPanel />
 )}

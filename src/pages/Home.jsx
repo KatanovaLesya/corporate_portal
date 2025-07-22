@@ -20,13 +20,19 @@ const Home = () => {
 
   // 2. Перевіряємо user 
     const checkUser = async () => {
+  // щоб запускалася сторінка без токіна
+      if (!token) {
+      setChecking(false);
+      return;
+    }
+
       const user = await getCurrentUser();
       if (user) {
         if (!user.roles || user.roles.length === 0 || (user.roles.length === 1 && user.roles[0] === "guest")) {
           navigate("/no-access");
         } else {
           navigate("/dashboard");
-        }
+      }
 
         return;
       }
