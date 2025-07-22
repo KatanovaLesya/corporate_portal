@@ -16,7 +16,7 @@ const UserInfo = ({ user, onLogout }) => {
           {user.roles && user.roles.length > 0 ? user.roles.join(", ") : "Немає ролей"}
         </div>
       </div>
-      <button className={styles["profile-btn"]} onClick={() => navigate("/profile")}>Профіль</button>
+      <button className={styles["profile-btn"]} onClick={() => navigate("/profile")}>PROFILE</button>
       <button className={styles["logout-btn"]} onClick={onLogout}>LOG OUT</button>
     </div>
   );
