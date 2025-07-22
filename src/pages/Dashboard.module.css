@@ -26,6 +26,7 @@
 .user-info-buttons{
     display: flex;
     flex-direction: column;
+    gap: 2px;
 }
 
 .logout-btn {
@@ -95,7 +96,7 @@
 
 .profile-btn {
     padding: 6px 12px;
-    background: #f44336;
+    background: #000000;
     color: #fff;
     border: none;
     border-radius: 5px;
