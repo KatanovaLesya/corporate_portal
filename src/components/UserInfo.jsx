@@ -1,7 +1,9 @@
 import styles from "../pages/Dashboard.module.css"; 
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
 
 const UserInfo = ({ user, onLogout }) => {
+  const navigate = useNavigate();
   if (!user) return null;
 
   return (
@@ -14,6 +16,7 @@ const UserInfo = ({ user, onLogout }) => {
           {user.roles && user.roles.length > 0 ? user.roles.join(", ") : "Немає ролей"}
         </div>
       </div>
+      <button className={styles["profile-btn"]} onClick={() => navigate("/profile")}>Профіль</button>
       <button className={styles["logout-btn"]} onClick={onLogout}>LOG OUT</button>
     </div>
   );

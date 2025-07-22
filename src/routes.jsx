@@ -4,6 +4,7 @@ import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NoAccess from "./components/NoAccess"; 
 import AdminPanel from "./components/AdminPanel"; 
+import ProfilePage from "./pages/ProfilePage";
 
 const AppRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const AppRoutes = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminPanel />} />
+          <Route path="/profile" element={<ProfilePage />} />
         </Route>
 
         {/* 404, або сторінка без доступу */}
