@@ -46,24 +46,23 @@ const ProfilePage = () => {
   };
 
   const saveTelegram = async () => {
-    await patchProfile({ telegram });
-    const currentUser = await getCurrentUser();
-    setUser(currentUser);
+    const updatedUser = await patchProfile({ telegram });
+    setUser(updatedUser);
     setEditTelegram(false);
   };
 
   const savePhone = async () => {
-    await patchProfile({ phone });
-    const currentUser = await getCurrentUser();
-    setUser(currentUser);
+    const updatedUser = await patchProfile({ phone });
+    setUser(updatedUser);
     setEditPhone(false);
   };
 
   const saveAvatar = async () => {
     if (avatarFile) {
       await uploadAvatar(avatarFile);
-      const currentUser = await getCurrentUser();
-      setUser(currentUser);
+      // оновити user, бо PATCH avatar повертає лише url:
+      const freshUser = await getCurrentUser();
+      setUser(freshUser);
       setEditAvatar(false);
       setAvatarPreview(null);
       setAvatarFile(null);
