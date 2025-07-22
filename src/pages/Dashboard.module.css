@@ -26,10 +26,11 @@
 .user-info-buttons{
     display: flex;
     flex-direction: column;
+    margin-left: 16px;
 }
 
 .logout-btn {
-    margin-left: 16px;
+    margin-bottom: 2px;
     padding: 6px 16px;
     background: #f44336;
     color: #fff;
