@@ -74,7 +74,7 @@ const ProfilePage = () => {
 
   return (
     <div className={styles["profile-page"]}>
-      <h2>Профіль користувача</h2>
+      <h2>PROFILE</h2>
 
       <div style={{ position: "relative", display: "inline-block" }}>
         <img
