@@ -73,125 +73,127 @@ const ProfilePage = () => {
   if (!user) return <div>Профіль не знайдено</div>;
 
   return (
-    <div className={styles["profile-page"]}>
-      <h2>PROFILE</h2>
+    <div className={styles["profile-center"]}>
+      <div className={styles["profile-page"]}>
+        <h2>PROFILE</h2>
 
-      <div style={{ position: "relative", display: "inline-block" }}>
-        <img
-          src={avatarPreview || user.avatarURL || "/default-avatar.png"}
-          alt={user.name}
-          className={styles["profile-avatar"]}
-        />
-        <button
-          type="button"
-          className={styles["avatar-edit-btn"]}
-          onClick={() => fileInputRef.current?.click()}
-          title="Змінити аватар"
-        >
-          <PencilIcon size={18} />
-        </button>
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          style={{ display: "none" }}
-          onChange={handleAvatarChange}
-        />
-        {editAvatar && (
-          <div style={{ marginTop: 8, textAlign: "center" }}>
-            <button onClick={saveAvatar} className={styles["profile-save-btn"]}>
-              Зберегти аватар
-            </button>
-            <button
-              onClick={() => {
-                setEditAvatar(false);
-                setAvatarPreview(null);
-                setAvatarFile(null);
-              }}
-              className={styles["profile-cancel-btn"]}
-            >
-              Скасувати
-            </button>
+        <div style={{ position: "relative", display: "inline-block" }}>
+          <img
+            src={avatarPreview || user.avatarURL || "/default-avatar.png"}
+            alt={user.name}
+            className={styles["profile-avatar"]}
+          />
+          <button
+            type="button"
+            className={styles["avatar-edit-btn"]}
+            onClick={() => fileInputRef.current?.click()}
+            title="Змінити аватар"
+          >
+            <PencilIcon size={18} />
+          </button>
+          <input
+            type="file"
+            accept="image/*"
+            ref={fileInputRef}
+            style={{ display: "none" }}
+            onChange={handleAvatarChange}
+          />
+          {editAvatar && (
+            <div style={{ marginTop: 8, textAlign: "center" }}>
+              <button onClick={saveAvatar} className={styles["profile-save-btn"]}>
+                Зберегти аватар
+              </button>
+              <button
+                onClick={() => {
+                  setEditAvatar(false);
+                  setAvatarPreview(null);
+                  setAvatarFile(null);
+                }}
+                className={styles["profile-cancel-btn"]}
+              >
+                Скасувати
+              </button>
+            </div>
+          )}
+        </div>
+
+        <div className={styles["profile-fields-list"]}>
+          <div className={styles["profile-field-row"]}>
+            <span className={styles["profile-label"]}>Ім'я:</span>
+            <span className={styles["profile-field-value"]}>{user.name}</span>
           </div>
-        )}
-      </div>
-
-      <div className={styles["profile-fields-list"]}>
-        <div className={styles["profile-field-row"]}>
-          <span className={styles["profile-label"]}>Ім'я:</span>
-          <span className={styles["profile-field-value"]}>{user.name}</span>
-        </div>
-        <div className={styles["profile-field-row"]}>
-          <span className={styles["profile-label"]}>Email:</span>
-          <span className={styles["profile-field-value"]}>{user.email}</span>
-        </div>
-        <div className={styles["profile-field-row"]}>
-          <span className={styles["profile-label"]}>Telegram:</span>
-          {editTelegram ? (
-            <>
-              <input
-                className={styles["profile-edit-input"]}
-                type="text"
-                value={telegram}
-                onChange={e => setTelegram(e.target.value)}
-              />
-              <button onClick={saveTelegram} className={styles["profile-save-btn"]}>Зберегти</button>
-              <button
-                onClick={() => {
-                  setEditTelegram(false);
-                  setTelegram(user.telegram || "");
-                }}
-                className={styles["profile-cancel-btn"]}
-              >Скасувати</button>
-            </>
-          ) : (
-            <>
-              <span className={styles["profile-field-value"]}>{user.telegram || "Не вказано"}</span>
-              <button
-                className={styles["profile-edit-pencil"]}
-                onClick={() => setEditTelegram(true)}
-                title="Редагувати"
-              >
-                <PencilIcon />
-              </button>
-            </>
-          )}
-        </div>
-        <div className={styles["profile-field-row"]}>
-          <span className={styles["profile-label"]}>Телефон:</span>
-          {editPhone ? (
-            <>
-              <input
-                className={styles["profile-edit-input"]}
-                type="text"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-              />
-              <button onClick={savePhone} className={styles["profile-save-btn"]}>Зберегти</button>
-              <button
-                onClick={() => {
-                  setEditPhone(false);
-                  setPhone(user.phone || "");
-                }}
-                className={styles["profile-cancel-btn"]}
-              >Скасувати</button>
-            </>
-          ) : (
-            <>
-              <span className={styles["profile-field-value"]}>{user.phone || "Не вказано"}</span>
-              <button
-                className={styles["profile-edit-pencil"]}
-                onClick={() => setEditPhone(true)}
-                title="Редагувати"
-              >
-                <PencilIcon />
-              </button>
-            </>
-          )}
-        </div>
-        <div className={styles["profile-field-row"]}>
-          <span className={styles["profile-label"]}>Відділ:</span>
-          <span className={styles["profile-field-value"]}>{user.department || "Не вказано"}</span>
+          <div className={styles["profile-field-row"]}>
+            <span className={styles["profile-label"]}>Email:</span>
+            <span className={styles["profile-field-value"]}>{user.email}</span>
+          </div>
+          <div className={styles["profile-field-row"]}>
+            <span className={styles["profile-label"]}>Telegram:</span>
+            {editTelegram ? (
+              <>
+                <input
+                  className={styles["profile-edit-input"]}
+                  type="text"
+                  value={telegram}
+                  onChange={e => setTelegram(e.target.value)}
+                />
+                <button onClick={saveTelegram} className={styles["profile-save-btn"]}>Зберегти</button>
+                <button
+                  onClick={() => {
+                    setEditTelegram(false);
+                    setTelegram(user.telegram || "");
+                  }}
+                  className={styles["profile-cancel-btn"]}
+                >Скасувати</button>
+              </>
+            ) : (
+              <>
+                <span className={styles["profile-field-value"]}>{user.telegram || "Не вказано"}</span>
+                <button
+                  className={styles["profile-edit-pencil"]}
+                  onClick={() => setEditTelegram(true)}
+                  title="Редагувати"
+                >
+                  <PencilIcon />
+                </button>
+              </>
+            )}
+          </div>
+          <div className={styles["profile-field-row"]}>
+            <span className={styles["profile-label"]}>Телефон:</span>
+            {editPhone ? (
+              <>
+                <input
+                  className={styles["profile-edit-input"]}
+                  type="text"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                />
+                <button onClick={savePhone} className={styles["profile-save-btn"]}>Зберегти</button>
+                <button
+                  onClick={() => {
+                    setEditPhone(false);
+                    setPhone(user.phone || "");
+                  }}
+                  className={styles["profile-cancel-btn"]}
+                >Скасувати</button>
+              </>
+            ) : (
+              <>
+                <span className={styles["profile-field-value"]}>{user.phone || "Не вказано"}</span>
+                <button
+                  className={styles["profile-edit-pencil"]}
+                  onClick={() => setEditPhone(true)}
+                  title="Редагувати"
+                >
+                  <PencilIcon />
+                </button>
+              </>
+            )}
+          </div>
+          <div className={styles["profile-field-row"]}>
+            <span className={styles["profile-label"]}>Відділ:</span>
+            <span className={styles["profile-field-value"]}>{user.department || "Не вказано"}</span>
+          </div>
         </div>
       </div>
     </div>
