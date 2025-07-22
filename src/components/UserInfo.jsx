@@ -12,8 +12,6 @@ const UserInfo = ({ user, onLogout }) => {
       <div>
         <span className={styles["user-info__name"]}>{user.name}</span>
         <div className={styles["user-info__email"]}>{user.email}</div>
-        <div className={styles["user-info__profile"]}>{user.phone}</div>
-        <div className={styles["user-info__profile"]}>{user.telegram}</div>
         <div className={styles["user-info__roles"]}>
           {user.roles && user.roles.length > 0 ? user.roles.join(", ") : "Немає ролей"}
         </div>
