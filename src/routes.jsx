@@ -14,7 +14,7 @@ const AppRoutes = () => {
         {/* Всі захищені сторінки всередині ProtectedRoute */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin-panel" element={<AdminPanel />} />
+          <Route path="/admin" element={<AdminPanel />} />
         </Route>
 
         {/* 404, або сторінка без доступу */}

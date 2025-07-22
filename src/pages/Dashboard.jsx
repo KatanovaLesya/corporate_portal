@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, signOut } from "../services/authService";
 import styles from "./Dashboard.module.css"; 
-import AdminPanel from "../components/AdminPanel";
 import { modules } from "../config/modulesConfig";
 import { Link } from "react-router-dom";
 import UserInfo from "../components/UserInfo";
@@ -50,13 +49,7 @@ const Dashboard = () => {
                 </Link>
               ))}
           </div>
-        </div>
-
-      {user.roles && user.roles.includes("admin") && (
-  <AdminPanel />
-)}
-      
-      
+      </div>
     </div>
   );
 };

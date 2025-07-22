@@ -1,7 +1,7 @@
 export const modules = [
   {
     name: "Адмін-панель",
-    path: "/admin-panel",
+    path: "/admin",
     roles: ["admin"],
     icon: "🛠️",
     description: "Керування користувачами та ролями"

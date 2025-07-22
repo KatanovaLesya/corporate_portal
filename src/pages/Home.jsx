@@ -41,8 +41,9 @@ const Home = () => {
     checkUser();
   }, [navigate]);
 
+  const API_URL = import.meta.env.VITE_API_URL;
   const signInWithGoogle = () => {
-    window.location.href = "https://back-corp-portal.onrender.com/api/auth/google";
+    window.location.href = `${API_URL}/auth/google`;
   };
 
   if (checking) return <div>Завантаження...</div>;
