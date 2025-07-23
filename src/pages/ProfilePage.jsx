@@ -81,26 +81,11 @@ const ProfilePage = () => {
         <h2>PROFILE</h2>
 
         <div style={{ position: "relative", display: "inline-block" }}>
-          <img
-            src={avatarPreview || user.avatarURL || "/default-avatar.png"}
-            alt={user.name}
-            className={styles["profile-avatar"]}
-          />
-          <button
-            type="button"
-            className={styles["avatar-edit-btn"]}
-            onClick={() => fileInputRef.current?.click()}
-            title="Змінити аватар"
-          >
+          <img src={avatarPreview || user.avatarURL || "/default-avatar.png"} alt={user.name} className={styles["profile-avatar"]}/>
+          <button type="button" className={styles["avatar-edit-btn"]} onClick={() => fileInputRef.current?.click()} title="Змінити аватар">
             <PencilIcon size={18} />
           </button>
-          <input
-            type="file"
-            accept="image/*"
-            ref={fileInputRef}
-            style={{ display: "none" }}
-            onChange={handleAvatarChange}
-          />
+          <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleAvatarChange}/>
           {editAvatar && (
             <div style={{ marginTop: 8, textAlign: "center" }}>
               <button onClick={saveAvatar} className={styles["profile-save-btn"]}>
@@ -200,7 +185,7 @@ const ProfilePage = () => {
         </div>
       </div>
       
-      <button className={styles["profile-btn"]} onClick={() => navigate("/dashboard")}>DASHBOARD</button>
+      <button className={styles["profile-btn-dashboard"]} onClick={() => navigate("/dashboard")}>DASHBOARD</button>
       
     </div>
   );
