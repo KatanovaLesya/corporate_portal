@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { getCurrentUser, patchProfile, uploadAvatar } from "../services/authService";
-import styles from "./Dashboard.module.css";
+import styles from "./ProfilePage.module.css";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 

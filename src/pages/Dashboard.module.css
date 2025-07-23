@@ -1,36 +1,3 @@
-.user-info-top-right {
-    position: absolute;
-    top: 24px;
-    right: 32px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #fff;
-    padding: 6px 16px;
-    border-radius: 32px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-    z-index: 10;
-    max-width: 99vw;
-}
-
-.user-info__avatar {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.user-info__roles {
-    font-size: 0.95rem;
-    color: #555;
-    margin-top: 2px;
-}
-
-.user-info-buttons{
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
 
 .logout-btn {
     padding: 6px 16px;
@@ -44,17 +11,6 @@
 
 .logout-btn:hover {
     background: #d32f2f;
-}
-
-.user-info__name {
-    font-weight: 600;
-    margin-right: 8px;
-    font-size: 1.1rem;
-}
-
-.user-info__email {
-    color: #888;
-    font-size: 0.95em;
 }
 
 .modulesSection {
@@ -98,15 +54,6 @@
     margin-bottom: 8px;
 }
 
-.profile-outer-col {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 28px;
-}
-
 .profile-btn {
     padding: 6px 12px;
     background: #000000;
@@ -117,133 +64,7 @@
     transition: background 0.18s;
 }
 
-.profile-page {
-  max-width: 440px;
-  margin: 0 auto;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 16px rgba(60,80,150,0.07);
-  padding: 36px 28px 28px 28px;
-}
-
-.profile-center{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-            
-        
-}
-
-.profile-avatar {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 50%;
-  border: 2px solid #eee;
-  background: #fafafd;
-  display: block;
-  margin: 0 auto;
-}
-
-.avatar-edit-btn {
-  position: absolute;
-  right: 2px;
-  bottom: 6px;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  padding: 5px;
-  cursor: pointer;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
-  z-index: 2;
-}
-
-.profile-fields-list {
-  margin-top: 24px;
-}
-
-.profile-field-row {
-  display: flex;
-  align-items: center;
-  margin-top: 12px;
-}
-
-.profile-label {
-  font-weight: 600;
-  min-width: 88px;
-  display: inline-block;
-}
-
-.profile-field-value {
-  margin-left: 8px;
-}
-
-.profile-edit-pencil {
-  margin-left: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  vertical-align: middle;
-}
-
-.profile-edit-input {
-  margin-left: 8px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid #d5dbe2;
-  font-size: 1rem;
-}
-
-.profile-save-btn {
-  margin-left: 8px;
-  background: #2677f4;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 14px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.profile-save-btn:hover {
-  background: #1959c8;
-}
-
-.profile-cancel-btn {
-  margin-left: 5px;
-  background: #eee;
-  color: #444;
-  border: none;
-  border-radius: 6px;
-  padding: 4px 14px;
-  font-size: 1rem;
-  cursor: pointer;
-}
 @media (max-width: 600px) {
-  .user-info-top-right {
-    right: 0px;
-    top: 4px;
-    gap: 6px;
-    max-width: 97vw;
-    font-size: 0.96em;
-  }
-
-
-
-  .user-info__name,
-  .user-info__email,
-  .user-info__roles {
-    font-size: 0.98em;
-    max-width: 95vw;
-  }
-
-  .user-info-buttons {
-    width: 100%;
-    gap: 8px;
-    margin-left: 0;
-  }
 
   .profile-btn,
   .logout-btn {
@@ -253,8 +74,6 @@
     box-sizing: border-box;
     margin-top: 0;
   }
-
-  /* Dashboard card/grid adaptivity */
   .modulesSection {
     margin-top: 16px;
     width: 100%;
