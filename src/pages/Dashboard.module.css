@@ -216,9 +216,35 @@
   font-size: 1rem;
   cursor: pointer;
 }
+/* АДАПТИВ ДЛЯ МОБІЛЬНИХ */
 @media (max-width: 600px) {
-    .profile-page {
-        padding: 14px 6px 18px 6px;
-        max-width: 99vw;
-    }
+  .profile-page {
+    max-width: 99vw;
+    padding: 18px 3vw 14px 3vw;
+    border-radius: 12px;
+    box-shadow: 0 1px 8px rgba(80, 100, 180, 0.10);
+  }
+
+  .profile-outer-col {
+    gap: 16px;
+  }
+
+  .profile-btn {
+    width: 100%;
+    max-width: 360px;
+    font-size: 1rem;
+    padding: 12px 0;
+  }
+}
+
+/* Ще меншi екрани (наприклад iPhone SE) */
+@media (max-width: 400px) {
+  .profile-page {
+    padding: 10px 1vw;
+  }
+
+  .profile-btn {
+    font-size: 0.95rem;
+    padding: 10px 0;
+  }
 }
