@@ -2,6 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { getCurrentUser, patchProfile, uploadAvatar } from "../services/authService";
 import styles from "./Dashboard.module.css";
 import PropTypes from "prop-types";
+import { useNavigate } from "react-router-dom";
+
 
 const PencilIcon = ({ size = 16 }) => (
   <svg width={size} height={size} fill="gray" viewBox="0 0 20 20">
@@ -24,6 +26,7 @@ const ProfilePage = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const fileInputRef = useRef();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -197,7 +200,7 @@ const ProfilePage = () => {
         </div>
       </div>
       
-      <button className={styles["profile-btn"]} onClick={() => window.history.back()}>DASHBOARD</button>
+      <button className={styles["profile-btn"]} onClick={() => navigate("/dashboard")}>DASHBOARD</button>
       
     </div>
   );
