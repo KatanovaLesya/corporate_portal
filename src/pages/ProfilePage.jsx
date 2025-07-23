@@ -196,9 +196,9 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-      <div className={styles["profile-fields-list"]}>
-        <button className={styles["profile-btn"]} onClick={() => window.history.back()}>DASHBOARD</button>
-      </div>
+      
+      <button className={styles["profile-btn"]} onClick={() => window.history.back()}>DASHBOARD</button>
+      
     </div>
   );
 };
