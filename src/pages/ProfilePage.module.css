@@ -126,17 +126,14 @@
 }
 
 .profile-btn-dashboard {
-    display: block;
-    width: 100%;
-    max-width: 340px;
-    margin: 12px auto 0 auto;
-    padding: 12px 0;
-    border-radius: 12px;
-    font-size: 1.02rem;
-    background: #212529;
+    padding: 6px 12px;
+    background: #000000;
     color: #fff;
-    font-weight: 500;
-    letter-spacing: 1px;
+    border: none;
+    border-radius: 32px;
+    cursor: pointer;
+    transition: background 0.18s;
+    display: inline-block;
 }
 
 @media (max-width: 600px) {
