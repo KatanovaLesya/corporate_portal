@@ -207,3 +207,9 @@
   font-size: 1rem;
   cursor: pointer;
 }
+@media (max-width: 600px) {
+    .profile-page {
+        padding: 14px 6px 18px 6px;
+        max-width: 99vw;
+    }
+}
