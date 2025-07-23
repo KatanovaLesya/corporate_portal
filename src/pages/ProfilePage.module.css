@@ -153,3 +153,25 @@
             min-height: unset;
 }
 }
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #181a1b;
+    }
+
+    .profile-page {
+        background: #242526;
+        color: #f1f1f1;
+        box-shadow: 0 2px 12px rgba(10, 20, 40, 0.17);
+        border: 1px solid #343a40;
+    }
+
+    .profile-label {
+        color: #e0e0e0;
+    }
+
+    .profile-btn {
+        background: #444;
+        color: #fff;
+    }
+}
