@@ -12,6 +12,6 @@
 
 @media (max-width: 600px) {
     .header {
-       
+        margin-bottom: 8px;
     }
 }
