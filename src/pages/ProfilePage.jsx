@@ -119,7 +119,7 @@ const ProfilePage = () => {
 
         <div className={styles["profile-fields-list"]}>
           <div className={styles["profile-field-row"]}>
-            <span className={styles["profile-label"]}>Ім'я:</span>
+            <span className={styles["profile-label"]}>Імʼя:</span>
             <span className={styles["profile-field-value"]}>{user.name}</span>
           </div>
           <div className={styles["profile-field-row"]}>
@@ -195,6 +195,9 @@ const ProfilePage = () => {
             <span className={styles["profile-field-value"]}>{user.department || "Не вказано"}</span>
           </div>
         </div>
+      </div>
+      <div className={styles["profile-fields-list"]}>
+        <button className={styles["profile-btn"]} onClick={() => window.history.back()}>DASHBOARD</button>
       </div>
     </div>
   );
