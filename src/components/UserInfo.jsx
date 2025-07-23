@@ -18,7 +18,7 @@ const UserInfo = ({ user, onLogout }) => {
       </div>
       <div className={styles["user-info-buttons"]}>
         <button className={styles["profile-btn"]} onClick={() => navigate("/profile")}>PROFILE</button>
-        <button className={styles["logout-btn"]} onClick={onLogout}>LOG OUT</button>
+        <button className={styles["logout-btn"]} onClick={onLogout}>LOGOUT</button>
       </div>
     </div>
   );
