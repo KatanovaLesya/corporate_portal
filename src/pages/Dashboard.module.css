@@ -231,34 +231,26 @@
     font-size: 0.96em;
   }
 
-  .user-info__avatar {
-    width: 34px;
-    height: 34px;
-  }
+
 
   .user-info__name,
   .user-info__email,
   .user-info__roles {
     font-size: 0.98em;
-    word-break: break-word;
     max-width: 95vw;
   }
 
   .user-info-buttons {
     width: 100%;
-    flex-direction: row;
     gap: 8px;
     margin-left: 0;
-    justify-content: flex-start;
   }
 
   .profile-btn,
   .logout-btn {
     width: 100%;
     min-width: 0;
-    font-size: 0.99rem;
-    padding: 10px 0;
-    border-radius: 16px;
+    font-size: 0.90rem;
     box-sizing: border-box;
     margin-top: 0;
   }
