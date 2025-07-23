@@ -1,4 +1,4 @@
-import styles from "../pages/Dashboard.module.css"; 
+import styles from "./UserInfo.module.css"; 
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 
