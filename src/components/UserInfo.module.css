@@ -70,7 +70,7 @@
 
 @media (max-width: 600px) {
     .user-info-top-right {
-        right: 0px;
+        right: auto;
         top: 4px;
         gap: 6px;
         max-width: 97vw;
