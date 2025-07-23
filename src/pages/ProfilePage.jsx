@@ -76,7 +76,7 @@ const ProfilePage = () => {
   if (!user) return <div>Профіль не знайдено</div>;
 
   return (
-    <div className={styles["profile-center"]}>
+    <div className={styles["profile-outer-col"]}>
       <div className={styles["profile-page"]}>
         <h2>PROFILE</h2>
 
