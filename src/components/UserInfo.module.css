@@ -66,3 +66,35 @@
     cursor: pointer;
     transition: background 0.18s;
 }
+
+@media (max-width: 600px) {
+    .user-info-top-right {
+        right: 0px;
+        top: 4px;
+        gap: 6px;
+        max-width: 97vw;
+        font-size: 0.96em;
+    }
+
+    .user-info__name,
+    .user-info__email,
+    .user-info__roles {
+        font-size: 0.98em;
+        max-width: 95vw;
+    }
+
+    .user-info-buttons {
+        width: 100%;
+        gap: 8px;
+        margin-left: 0;
+    }
+
+    .profile-btn,
+    .logout-btn {
+        width: 100%;
+        min-width: 0;
+        font-size: 0.90rem;
+        box-sizing: border-box;
+        margin-top: 0;
+    }
+    }
