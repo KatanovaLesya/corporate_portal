@@ -6,11 +6,12 @@
     align-items: center;
     gap: 12px;
     background: #fff;
-    padding: 6px 16px;
+    padding: 6px 28px;
     border-radius: 32px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
     z-index: 10;
     max-width: 99vw;
+  
 }
 
 .user-info__avatar {
