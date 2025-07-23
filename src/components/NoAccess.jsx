@@ -22,7 +22,7 @@ const NoAccess = () => {
           rel="noopener noreferrer"
           className={styles.button}
         >
-          Контактуватися з Дмитром Каліниним
+          Дмитро Калінін
         </a>
 
         <a
@@ -31,7 +31,7 @@ const NoAccess = () => {
           rel="noopener noreferrer"
           className={styles.button}
         >
-          Контактуватися з Катериною Чернегою
+          Катерина Чернега
         </a>
 
         <a
@@ -40,7 +40,7 @@ const NoAccess = () => {
           rel="noopener noreferrer"
           className={styles.button}
         >
-          Контактуватися з Лесею Катановою
+          Леся Катанова
         </a>
       </div>
     </div>
