@@ -98,3 +98,9 @@
         margin-top: 0;
     }
     }
+
+@media (prefers-color-scheme: dark) {
+    .user-info__name {
+        color: black;
+    }
+}
