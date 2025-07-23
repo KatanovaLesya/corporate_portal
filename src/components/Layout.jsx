@@ -1,25 +1,32 @@
-// src/components/Layout.jsx
+// Layout.jsx
 import Header from "./Header";
 import { Outlet } from "react-router-dom";
-import PropTypes from "prop-types";
+import { useEffect, useState } from "react";
+import { getCurrentUser, signOut } from "../services/authService";
 
-const Layout = ({ user, onLogout }) => (
-  <>
-    <Header user={user} onLogout={onLogout} />
-    <main>
-      <Outlet />
-    </main>
-  </>
-);
-Layout.propTypes = {
-  user: PropTypes.shape({
-    avatarURL: PropTypes.string,
-    name: PropTypes.string,
-    email: PropTypes.string,
-    phone: PropTypes.string,
-    telegram: PropTypes.string,
-    roles: PropTypes.arrayOf(PropTypes.string)
-  }),
-  onLogout: PropTypes.func
+const Layout = () => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      const u = await getCurrentUser();
+      setUser(u);
+    })();
+  }, []);
+
+  const onLogout = () => {
+    signOut();
+    window.location.href = "/";
+  };
+
+  return (
+    <>
+      <Header user={user} onLogout={onLogout} />
+      <main>
+        <Outlet />
+      </main>
+    </>
+  );
 };
+
 export default Layout;
