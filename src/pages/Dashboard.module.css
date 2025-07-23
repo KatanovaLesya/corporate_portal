@@ -224,26 +224,16 @@
 }
 @media (max-width: 600px) {
   .user-info-top-right {
-    position: static;
-    flex-direction: column;
-    align-items: flex-start;
+    right: 0px;
+    top: 4px;
     gap: 6px;
-    padding: 8px 4vw 8px 4vw;
-    /* Більше повітря з боків, гумово! */
-    border-radius: 18px;
-    box-shadow: 0 1px 8px rgba(60, 80, 150, 0.08);
-    width: 100vw;
-    /* Справді гумово! */
-    max-width: 100vw;
-    min-width: 0;
-    margin: 10px 0 0 0;
-    box-sizing: border-box;
+    max-width: 97vw;
+    font-size: 0.96em;
   }
 
   .user-info__avatar {
     width: 34px;
     height: 34px;
-    margin-bottom: 2px;
   }
 
   .user-info__name,
