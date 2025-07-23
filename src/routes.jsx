@@ -5,6 +5,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NoAccess from "./components/NoAccess"; 
 import AdminPanel from "./components/AdminPanel"; 
 import ProfilePage from "./pages/ProfilePage";
+import Layout from "./components/Layout"; 
 
 const AppRoutes = () => {
   return (
@@ -14,12 +15,13 @@ const AppRoutes = () => {
 
         {/* Всі захищені сторінки всередині ProtectedRoute */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route element={<Layout /* user={...} onLogout={...} */ />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
         </Route>
-
-        {/* 404, або сторінка без доступу */}
+        {/* Сторінка без доступу */}
         <Route path="/no-access" element={<NoAccess />} />
       </Routes>
     </Router>
