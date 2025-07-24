@@ -56,7 +56,7 @@ const AdminPanel = () => {
 
   return (
     <div style={{ padding: "32px" }}>
-      <h1>🛠️ Адмін-панель</h1>
+      <h2>Призначення ролей</h2>
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
         <thead>
           <tr style={{ background: "#fafafa" }}>

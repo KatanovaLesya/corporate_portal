@@ -223,7 +223,7 @@ export const ROLE_ICON_MAP = {
   expert: ExpertIcon,
   guest: GuestIcon,
   chief: ChiefIcon,
-  commercial: CommercialDirectorIcon,
+  commercialist: CommercialDirectorIcon,
   sales: SalesIcon,
 };
 
