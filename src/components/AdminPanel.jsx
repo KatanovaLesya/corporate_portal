@@ -58,7 +58,7 @@ const AdminPanel = () => {
           <tr style={{ background: "#fafafa" }}>
             <th style={{ padding: "8px", border: "1px solid #ccc" }}>Ім’я</th>
         
-            <th style={{ padding: "8px", border: "1px solid #ccc" }}>Ролі</th>
+           
             <th style={{ padding: "8px", border: "1px solid #ccc" }}>Керування</th>
           </tr>
         </thead>
@@ -67,9 +67,7 @@ const AdminPanel = () => {
             <tr key={u.id}>
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>{u.name}</td>
              
-              <td style={{ padding: "8px", border: "1px solid #ccc" }}>
-                {u.roles && u.roles.length > 0 ? u.roles.join(", ") : <span style={{ color: "#aaa" }}>—</span>}
-              </td>
+              
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>
                 {roles.map(role => (
                   <label key={role} style={{ marginRight: 12 }}>
