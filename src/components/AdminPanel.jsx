@@ -5,7 +5,7 @@ import {
   addUserRole,
   removeUserRole
 } from "../services/adminService";
-import { ROLE_ICON_MAP } from "../icons/roleIcons";
+import { ROLE_ICON_MAP, ROLE_LABELS } from "../icons/roleIcons";
 import styles from "./AdminPanel.module.css";
 
 const ACTIVE_COLOR = "#D32F2F";
@@ -58,6 +58,18 @@ const AdminPanel = () => {
   return (
     <div className={styles.panelContainer}>
       <h2 className={styles.heading}>Призначення ролей</h2>
+      <div className={styles.legend}>
+        {roles.map(role => {
+          const Icon = ROLE_ICON_MAP[role];
+          if (!Icon) return null;
+          return (
+            <span key={role} className={styles.legendItem}>
+              <Icon color={ACTIVE_COLOR} size={22} />
+              <span className={styles.legendLabel}>{ROLE_LABELS[role]}</span>
+            </span>
+          );
+        })}
+      </div>
       <table className={styles.table}>
         <thead>
           <tr>

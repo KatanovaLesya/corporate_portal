@@ -227,6 +227,15 @@ export const ROLE_ICON_MAP = {
   sales: SalesIcon,
 };
 
+export const ROLE_LABELS = {
+  admin: "Адмін",
+  expert: "Експерт",
+  guest: "Гість",
+  chief: "Керівник департаменту",
+  sales: "Менеджер з продажу",
+  commercialist: "Комерційний директор",
+};
+
 
 
 
