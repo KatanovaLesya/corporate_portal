@@ -63,3 +63,22 @@
     align-items: center;
     gap: 8px;
 }
+
+.legend {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 20px;
+    margin-top: 12px;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.legendLabel {
+    font-size: 1rem;
+    color: #2d3748;
+}
