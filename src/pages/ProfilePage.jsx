@@ -126,6 +126,8 @@ const ProfilePage = () => {
                   type="text"
                   value={telegram}
                   onChange={e => setTelegram(e.target.value)}
+                  size={Math.max(telegram.length, 10)}
+                  maxLength={48}
                 />
                 <button onClick={saveTelegram} className={styles["profile-save-btn"]} title="Зберегти">
                   <IoSave size={22} />
@@ -163,6 +165,8 @@ const ProfilePage = () => {
                   type="text"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
+                  size={Math.max(phone.length, 10)}
+                  maxLength={48}
                 />
                 <button onClick={savePhone} className={styles["profile-save-btn"]} title="Зберегти">
                   <IoSave size={22} />

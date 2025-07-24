@@ -69,6 +69,7 @@
     display: flex;
     align-items: center;
     margin-top: 12px;
+    gap:8px;
 }
 
 .profile-label {
@@ -96,6 +97,13 @@
     border-radius: 6px;
     border: 1px solid #d5dbe2;
     font-size: 1rem;
+    min-width: 70px;
+    width: auto;
+    max-width: 210px;
+    box-sizing: border-box;
+        /* Додай щоб текст зліва обрізався, якщо занадто довгий: */
+    overflow-x: auto;
+    white-space: nowrap;
 }
 
 .profile-cancel-btn {
