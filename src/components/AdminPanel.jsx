@@ -68,7 +68,7 @@ const AdminPanel = () => {
           {users.map(u => (
             <tr key={u.id}>
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>{u.name}</td>
-              <td style={{ padding: "8px", border: "1px solid #ccc", display: "flex", gap: "12px" }}>
+              <td style={{ padding: "8px", border: "1px solid #ccc", display: "flex", gap: "3px" }}>
                 {roles.map(role => {
                   const Icon = ROLE_ICON_MAP[role];
                   if (!Icon) return null;
