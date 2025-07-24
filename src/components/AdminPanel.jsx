@@ -7,15 +7,18 @@ import {
 } from "../services/adminService";
 import { ROLE_ICON_MAP, ROLE_LABELS } from "../icons/roleIcons";
 import styles from "./AdminPanel.module.css";
+import { useNavigate } from "react-router-dom";
 
 const ACTIVE_COLOR = "#D32F2F";
 const INACTIVE_COLOR = "#bbb";
+
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Завантаження користувачів і ролей
   const fetchData = async () => {
@@ -102,9 +105,14 @@ const AdminPanel = () => {
           ))}
         </tbody>
       </table>
+      <button className={styles["profile-btn-dashboard"]} onClick={() => navigate("/dashboard")}>DASHBOARD</button>
       {status && <div className={styles.statusMsg}>{status}</div>}
     </div>
+    
   );
+  
 };
+
+
 
 export default AdminPanel;
