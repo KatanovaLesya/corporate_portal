@@ -74,8 +74,10 @@
 
 .legendItem {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
 }
 
 .legendLabel {
