@@ -69,9 +69,8 @@
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
-    gap: 18px;
+    gap: 4px;
     margin-bottom: 20px;
-    margin-top: 12px;
 }
 
 .legendItem {
