@@ -66,6 +66,8 @@
 
 .legend {
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
     gap: 18px;
     margin-bottom: 20px;
@@ -74,8 +76,6 @@
 
 .legendItem {
     display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
     align-items: center;
     gap: 10px;
 }
