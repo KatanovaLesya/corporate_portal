@@ -3,6 +3,8 @@ import { getCurrentUser, patchProfile, uploadAvatar } from "../services/authServ
 import styles from "./ProfilePage.module.css";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
+import { MdCancel } from "react-icons/md";
+import { IoSave } from "react-icons/io5";
 
 
 const PencilIcon = ({ size = 16 }) => (
@@ -88,8 +90,8 @@ const ProfilePage = () => {
           <input type="file" accept="image/*" ref={fileInputRef} style={{ display: "none" }} onChange={handleAvatarChange}/>
           {editAvatar && (
             <div style={{ marginTop: 8, textAlign: "center" }}>
-              <button onClick={saveAvatar} className={styles["profile-save-btn"]}>
-                Зберегти аватар
+              <button onClick={saveAvatar} className={styles["profile-save-btn"]} title="Зберегти">
+                <IoSave size={22} />
               </button>
               <button
                 onClick={() => {
@@ -98,8 +100,9 @@ const ProfilePage = () => {
                   setAvatarFile(null);
                 }}
                 className={styles["profile-cancel-btn"]}
+                title="Скасувати"
               >
-                Скасувати
+                <MdCancel size={22}/>
               </button>
             </div>
           )}
@@ -124,14 +127,19 @@ const ProfilePage = () => {
                   value={telegram}
                   onChange={e => setTelegram(e.target.value)}
                 />
-                <button onClick={saveTelegram} className={styles["profile-save-btn"]}>Зберегти</button>
+                <button onClick={saveTelegram} className={styles["profile-save-btn"]} title="Зберегти">
+                  <IoSave size={22} />
+                </button>
                 <button
                   onClick={() => {
                     setEditTelegram(false);
                     setTelegram(user.telegram || "");
                   }}
                   className={styles["profile-cancel-btn"]}
-                >Скасувати</button>
+                  title="Скасувати"
+                >
+                  <MdCancel size={22} />
+                </button>
               </>
             ) : (
               <>
@@ -156,14 +164,19 @@ const ProfilePage = () => {
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
                 />
-                <button onClick={savePhone} className={styles["profile-save-btn"]}>Зберегти</button>
+                <button onClick={savePhone} className={styles["profile-save-btn"]} title="Зберегти">
+                  <IoSave size={22} />
+                </button>
                 <button
                   onClick={() => {
                     setEditPhone(false);
                     setPhone(user.phone || "");
                   }}
                   className={styles["profile-cancel-btn"]}
-                >Скасувати</button>
+                  title="Скасувати"
+                >
+                  <MdCancel size={22} />
+                </button>
               </>
             ) : (
               <>
