@@ -12,32 +12,34 @@ const AdminPanel = () => {
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // Завантажуємо користувачів і ролі
+  // Завантаження користувачів і ролей
   const fetchData = async () => {
     setLoading(true);
     try {
       const [usersRes, rolesRes] = await Promise.all([getUsers(), getRoles()]);
       setUsers(usersRes);
       setRoles(rolesRes);
-      setLoading(false);
     } catch (err) {
       setStatus("Помилка завантаження користувачів або ролей");
+    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchData();
+    // eslint-disable-next-line
   }, []);
 
+  // Додаємо/видаляємо роль
   const handleToggleRole = async (user, role) => {
     setStatus("");
     try {
-      const hasRole = user.roles.some(r => r.name === role.name);
+      const hasRole = user.roles.includes(role);
       if (hasRole) {
-        await removeUserRole(user.id, role.name);
+        await removeUserRole(user.id, role);
       } else {
-        await addUserRole(user.id, role.name);
+        await addUserRole(user.id, role);
       }
       await fetchData();
       setStatus("✅ Оновлено!");
@@ -66,17 +68,17 @@ const AdminPanel = () => {
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>{u.name}</td>
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>{u.email}</td>
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>
-                {u.roles.map(r => r.name).join(", ")}
+                {u.roles && u.roles.length > 0 ? u.roles.join(", ") : <span style={{ color: "#aaa" }}>—</span>}
               </td>
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>
                 {roles.map(role => (
-                  <label key={role.name} style={{ marginRight: 12 }}>
+                  <label key={role} style={{ marginRight: 12 }}>
                     <input
                       type="checkbox"
-                      checked={u.roles.some(r => r.name === role.name)}
+                      checked={u.roles.includes(role)}
                       onChange={() => handleToggleRole(u, role)}
                     />
-                    {role.name}
+                    {role}
                   </label>
                 ))}
               </td>
@@ -90,5 +92,3 @@ const AdminPanel = () => {
 };
 
 export default AdminPanel;
-
-
