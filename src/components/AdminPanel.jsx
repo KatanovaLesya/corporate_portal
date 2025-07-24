@@ -6,6 +6,7 @@ import {
   removeUserRole
 } from "../services/adminService";
 import { ROLE_ICON_MAP } from "../icons/roleIcons";
+import styles from "./AdminPanel.module.css";
 
 const ACTIVE_COLOR = "#D32F2F";
 const INACTIVE_COLOR = "#bbb";
@@ -55,20 +56,20 @@ const AdminPanel = () => {
   if (loading) return <div>Завантаження...</div>;
 
   return (
-    <div style={{ padding: "32px" }}>
-      <h2>Призначення ролей</h2>
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "16px" }}>
+    <div className={styles.panelContainer}>
+      <h2 className={styles.heading}>Призначення ролей</h2>
+      <table className={styles.table}>
         <thead>
-          <tr style={{ background: "#fafafa" }}>
-            <th style={{ padding: "8px", border: "1px solid #ccc" }}>Ім’я</th>
-            <th style={{ padding: "8px", border: "1px solid #ccc" }}>Керування</th>
+          <tr>
+            <th className={styles.th}>Ім’я</th>
+            <th className={styles.th}>Керування</th>
           </tr>
         </thead>
         <tbody>
           {users.map(u => (
             <tr key={u.id}>
-              <td style={{ padding: "8px", border: "1px solid #ccc" }}>{u.name}</td>
-              <td style={{ padding: "8px", border: "1px solid #ccc", display: "flex", gap: "3px" }}>
+              <td className={styles.td}>{u.name}</td>
+              <td className={`${styles.td} ${styles.roleIconseCell}`}>
                 {roles.map(role => {
                   const Icon = ROLE_ICON_MAP[role];
                   if (!Icon) return null;
@@ -78,15 +79,7 @@ const AdminPanel = () => {
                       key={role}
                       onClick={() => handleToggleRole(u, role)}
                       title={role}
-                      style={{
-                        cursor: "pointer",
-                        opacity: isActive ? 1 : 0.5,
-                        transition: "opacity 0.2s",
-                        marginRight: "10px",
-                        borderRadius: "50%",
-                        padding: "4px",
-                        background: isActive ? "#ffeaea" : "transparent"
-                      }}
+                      className={styles.roleIcon + " " + (isActive ? styles.roleIconactive : styles.roleIconInactive)} 
                     >
                       <Icon color={isActive ? ACTIVE_COLOR : INACTIVE_COLOR} size={28} />
                     </span>
@@ -97,7 +90,7 @@ const AdminPanel = () => {
           ))}
         </tbody>
       </table>
-      {status && <div style={{ marginTop: 20, fontWeight: "bold" }}>{status}</div>}
+      {status && <div className={styles.statusMsg}>{status}</div>}
     </div>
   );
 };
