@@ -80,6 +80,10 @@
 }
 
 .legendLabel {
-    font-size: 0.7rem;
+    font-size: 1rem;
     color: #89898a;
+}
+
+@media (max-width: 600px){
+    
 }
