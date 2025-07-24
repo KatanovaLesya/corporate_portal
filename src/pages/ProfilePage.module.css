@@ -154,6 +154,10 @@
     .profile-outer-col {
             min-height: unset;
 }
+.profile-page{
+    max-width: 374px;
+    padding: 18px;
+}
 }
 
 @media (prefers-color-scheme: dark) {
