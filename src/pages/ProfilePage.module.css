@@ -5,7 +5,7 @@
     align-items: center;
     justify-content: center;
     gap: 28px;
-    margin-top: 60px;
+   
 }
 
 .profile-page {
@@ -15,6 +15,7 @@
     border-radius: 16px;
     box-shadow: 0 2px 16px rgba(60, 80, 150, 0.07);
     padding: 36px 28px 28px 28px;
+    margin-top: 60px;
 }
 
 .profile-avatar {
