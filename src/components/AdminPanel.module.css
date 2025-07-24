@@ -93,6 +93,7 @@
     cursor: pointer;
     transition: background 0.18s;
     display: inline-block;
+    margin-top: 20px;
 }
 
 @media (max-width: 600px){
