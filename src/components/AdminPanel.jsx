@@ -64,7 +64,7 @@ const AdminPanel = () => {
           if (!Icon) return null;
           return (
             <span key={role} className={styles.legendItem}>
-              <Icon color={ACTIVE_COLOR} size={12} />
+              <Icon color={ACTIVE_COLOR} size={22} />
               <span className={styles.legendLabel}>{ROLE_LABELS[role]}</span>
             </span>
           );
