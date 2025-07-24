@@ -5,6 +5,10 @@ import {
   addUserRole,
   removeUserRole
 } from "../services/adminService";
+import { ROLE_ICON_MAP } from "../icons/roleIcons";
+
+const ACTIVE_COLOR = "#D32F2F";
+const INACTIVE_COLOR = "#bbb";
 
 const AdminPanel = () => {
   const [users, setUsers] = useState([]);
@@ -28,7 +32,7 @@ const AdminPanel = () => {
 
   useEffect(() => {
     fetchData();
-    // eslint-disable-next-line
+  // eslint-disable-next-line
   }, []);
 
   // Додаємо/видаляємо роль
@@ -57,8 +61,6 @@ const AdminPanel = () => {
         <thead>
           <tr style={{ background: "#fafafa" }}>
             <th style={{ padding: "8px", border: "1px solid #ccc" }}>Ім’я</th>
-        
-           
             <th style={{ padding: "8px", border: "1px solid #ccc" }}>Керування</th>
           </tr>
         </thead>
@@ -66,19 +68,30 @@ const AdminPanel = () => {
           {users.map(u => (
             <tr key={u.id}>
               <td style={{ padding: "8px", border: "1px solid #ccc" }}>{u.name}</td>
-             
-              
-              <td style={{ padding: "8px", border: "1px solid #ccc" }}>
-                {roles.map(role => (
-                  <label key={role} style={{ marginRight: 12 }}>
-                    <input
-                      type="checkbox"
-                      checked={u.roles.includes(role)}
-                      onChange={() => handleToggleRole(u, role)}
-                    />
-                    {role}
-                  </label>
-                ))}
+              <td style={{ padding: "8px", border: "1px solid #ccc", display: "flex", gap: "12px" }}>
+                {roles.map(role => {
+                  const Icon = ROLE_ICON_MAP[role];
+                  if (!Icon) return null;
+                  const isActive = u.roles.includes(role);
+                  return (
+                    <span
+                      key={role}
+                      onClick={() => handleToggleRole(u, role)}
+                      title={role}
+                      style={{
+                        cursor: "pointer",
+                        opacity: isActive ? 1 : 0.5,
+                        transition: "opacity 0.2s",
+                        marginRight: "10px",
+                        borderRadius: "50%",
+                        padding: "4px",
+                        background: isActive ? "#ffeaea" : "transparent"
+                      }}
+                    >
+                      <Icon color={isActive ? ACTIVE_COLOR : INACTIVE_COLOR} size={28} />
+                    </span>
+                  );
+                })}
               </td>
             </tr>
           ))}
