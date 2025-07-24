@@ -42,18 +42,13 @@
 
 .profile-save-btn {
     margin-left: 8px;
-    background: #2677f4;
-    color: white;
+    background: #eee;
+    color: #444;
     border: none;
-    border-radius: 6px;
     padding: 4px 14px;
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s;
-}
-
-.profile-save-btn:hover {
-    background: #1959c8;
 }
 
 .profile-cancel-btn {
@@ -61,7 +56,6 @@
     background: #eee;
     color: #444;
     border: none;
-    border-radius: 6px;
     padding: 4px 14px;
     font-size: 1rem;
     cursor: pointer;
