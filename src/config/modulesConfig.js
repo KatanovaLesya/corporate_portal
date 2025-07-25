@@ -4,6 +4,7 @@ export const modules = [
     image: "/public/images/owl.jpg",
     path: "/admin",
     roles: ["admin"],
+    description: "Керування користувачами та ролями"
   },
  
 ];
