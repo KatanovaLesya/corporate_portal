@@ -15,7 +15,7 @@ const NoAccess = () => {
       </p>
 
       {/* Контакти адміністраторів */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginTop: "1rem", gap: "0.75rem" }}>
+      <div style={{ display: "flex", flexDirection: "row", alignItems: "center", marginTop: "1rem", gap: "0.75rem" }}>
         <a
           href="https://t.me/Dmytro_Kalinin_Solvensy"
           target="_blank"
