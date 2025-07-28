@@ -16,8 +16,9 @@ const Dashboard = () => {
               .filter(m => user.roles.some(role => m.roles.includes(role)))
               .map(m => (
                 <Link to={m.path} key={m.path} className={styles.moduleTile}>
-                  <span className={styles.moduleIcon}>{m.icon}</span>
+                  <img src={m.image} alt={m.name} className={styles.moduleImage} />
                   <span>{m.name}</span>
+                  {m.description && <div className={styles.moduleDescription}>{m.description}</div>}
                 </Link>
               ))}
           </div>
