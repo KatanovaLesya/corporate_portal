@@ -10,7 +10,6 @@ const Dashboard = () => {
   return (
     <div className="relative min-h-screen flex flex-col items-center justify-center">
       <div className={styles.modulesSection}>
-          <h2>Мої модулі</h2>
           <div className={styles.modulesGrid}>
             {modules
               .filter(m => user.roles.some(role => m.roles.includes(role)))
@@ -18,7 +17,6 @@ const Dashboard = () => {
                 <Link to={m.path} key={m.path} className={styles.moduleTile}>
                   <img src={m.image} alt={m.name} className={styles.moduleImage} />
                   <span>{m.name}</span>
-                  {m.description && <div className={styles.moduleDescription}>{m.description}</div>}
                 </Link>
               ))}
           </div>
