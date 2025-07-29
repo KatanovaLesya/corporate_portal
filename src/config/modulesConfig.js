@@ -59,7 +59,7 @@ export const modules = [
   },
   {
     name: "Контроль оборотів",
-    image: "/images/bear.png",
+    image: "/images/fox.jpg",
     path: "",
     roles: ["admin", "expert", "chief"],
     description: "Контроль лімітів по оборотам клієнтів"
