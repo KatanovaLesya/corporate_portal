@@ -72,12 +72,12 @@
 
 .moduleLabel {
   position: absolute;
-  left: 50%;
+  left: 0%;
   bottom: 24px;
-  transform: translateX(-50%);
+  transform: translateX(-0%);
   z-index: 2;
   padding: 10px 26px;
-  background: rgba(28, 28, 32, 0.51);
+  background: rgba(255, 255, 255, 0.8);
   color: #fff;
   font-size: 1.28rem;
   font-weight: 600;
