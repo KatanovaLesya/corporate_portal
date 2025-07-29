@@ -59,7 +59,7 @@ export const modules = [
   },
   {
     name: "Контроль оборотів",
-    image: "/images/bear.jpg",
+    image: "/images/bear.png",
     path: "",
     roles: ["admin", "expert", "chief"],
     description: "Контроль лімітів по оборотам клієнтів"
@@ -80,7 +80,7 @@ export const modules = [
   },
   {
     name: "Взаєморозрахунки",
-    image: "/images/owl.jpg",
+    image: "/images/cat2.jpg",
     path: "",
     roles: ["sales", "admin", "expert", "chief", "commercialist"],
     description: "Взаєморозрахунки з клієнтами"
