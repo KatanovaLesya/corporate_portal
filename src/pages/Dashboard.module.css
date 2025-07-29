@@ -49,6 +49,12 @@
     box-shadow: 0 4px 20px rgba(88, 101, 242, 0.13);
 }
 
+.moduleImage {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  background: #eaeaea;}
+
 .moduleIcon {
     font-size: 2.3rem;
     margin-bottom: 8px;
