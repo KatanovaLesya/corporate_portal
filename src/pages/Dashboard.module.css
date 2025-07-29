@@ -128,10 +128,6 @@
   }
 
   .moduleTile {
-    width: 96px;
-    height: 96px;
-    min-width: 76px;
-    min-height: 76px;
     border-radius: 10px;
     font-size: 0.97em;
     box-sizing: border-box;
