@@ -16,7 +16,7 @@ const Dashboard = () => {
               .map(m => (
                 <Link to={m.path} key={m.path} className={styles.moduleTile}>
                   <img src={m.image} alt={m.name} className={styles.moduleImage} />
-                    <span>{m.name}</span>
+                  <span className={styles.moduleLabel}>{m.name}</span>
                 </Link>
               ))}
           </div>
