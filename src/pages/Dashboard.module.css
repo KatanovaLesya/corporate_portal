@@ -122,8 +122,8 @@
 
   .modulesGrid {
     gap: 10px;
-    margin-top: 8px;
     flex-wrap: wrap;
+    margin: 16px;
   }
 
   .moduleTile {
