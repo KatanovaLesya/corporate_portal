@@ -80,7 +80,7 @@ export const modules = [
   },
   {
     name: "Взаєморозрахунки",
-    image: "/images/cat2.jpg",
+    image: "/images/tiger-snakes.jpg",
     path: "",
     roles: ["sales", "admin", "expert", "chief", "commercialist"],
     description: "Взаєморозрахунки з клієнтами"
