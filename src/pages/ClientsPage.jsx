@@ -7,12 +7,11 @@ import styles from "./ClientsPage.module.css";
 const PAGE_SIZE = 50;
 
 const ClientsPage = () => {
-  const [clients, setClients] = useState([]);
-  const [rows, setRows] = useState([]);
-  const [filteredRows, setFilteredRows] = useState([]);
+  const [allClients, setAllClients] = useState([]); // усі клієнти
+  const [rows, setRows] = useState([]);             // перетворені рядки
+  const [filteredRows, setFilteredRows] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
 
   // фільтри
   const [filters, setFilters] = useState({
@@ -26,33 +25,27 @@ const ClientsPage = () => {
     amountUah: null,
   });
 
+  // ======= Завантаження всіх клієнтів =======
   useEffect(() => {
     const fetchClients = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/clients", {
-          params: { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE },
-        });
-
-        console.log("API /clients:", res.data);
-
-        setClients(res.data.rows || []);
-        setTotal(res.data.count || 0);
+        const res = await api.get("/clients"); // без limit/offset
+        setAllClients(res.data.rows || []);
       } catch (err) {
         console.error("Помилка завантаження клієнтів", err);
       } finally {
         setLoading(false);
       }
     };
-
     fetchClients();
-  }, [page]);
+  }, []);
 
-  // перетворюємо клієнтів у рядки таблиці
+  // ======= Перетворення клієнтів у рядки таблиці =======
   useEffect(() => {
     const tableRows = [];
 
-    clients.forEach((client) => {
+    allClients.forEach((client) => {
       const clientName = client.name;
       const edrpou = client.edrpou;
 
@@ -114,10 +107,10 @@ const ClientsPage = () => {
     });
 
     setRows(tableRows);
-    setFilteredRows(tableRows);
-  }, [clients]);
+    setFilteredRows(tableRows); // початково всі
+  }, [allClients]);
 
-  // застосування фільтрів
+  // ======= Застосування фільтрів =======
   useEffect(() => {
     let temp = [...rows];
 
@@ -130,17 +123,24 @@ const ClientsPage = () => {
     });
 
     setFilteredRows(temp);
+    setPage(1); // скидати на першу сторінку після фільтрації
   }, [filters, rows]);
 
   const handleFilterChange = (col, option) => {
     setFilters((prev) => ({ ...prev, [col]: option ? option.value : null }));
   };
 
-  // формуємо унікальні значення для фільтрів
   const getOptions = (col) => {
     const unique = [...new Set(rows.map((r) => r[col] || "-"))];
     return unique.map((v) => ({ value: v, label: v }));
   };
+
+  // ======= Пагінація =======
+  const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
+  const paginatedRows = filteredRows.slice(
+    (page - 1) * PAGE_SIZE,
+    page * PAGE_SIZE
+  );
 
   if (loading) return <div>Завантаження...</div>;
 
@@ -175,7 +175,7 @@ const ClientsPage = () => {
           </tr>
         </thead>
         <tbody>
-          {filteredRows.map((r, i) => (
+          {paginatedRows.map((r, i) => (
             <tr key={i}>
               <td>{r.stack}</td>
               <td>{r.clientName}</td>
@@ -195,11 +195,11 @@ const ClientsPage = () => {
           Назад
         </button>
         <span>
-          {page} / {Math.ceil(total / PAGE_SIZE)}
+          {page} / {totalPages || 1}
         </span>
         <button
-          onClick={() => setPage((p) => (p < Math.ceil(total / PAGE_SIZE) ? p + 1 : p))}
-          disabled={page >= Math.ceil(total / PAGE_SIZE)}
+          onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
+          disabled={page >= totalPages}
         >
           Вперед
         </button>
