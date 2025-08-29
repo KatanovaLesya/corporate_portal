@@ -3,47 +3,98 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import styles from "./ClientsPage.module.css";
 
-// допоміжна функція щоб уникнути undefined/null
-const safe = (val) => (val !== null && val !== undefined ? val : "-");
-
 const PAGE_SIZE = 50;
 
 const ClientsPage = () => {
+  const [clients, setClients] = useState([]);
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [filters, setFilters] = useState({});
+  const [total, setTotal] = useState(0);
 
-  // ======= завантаження клієнтів =======
-  const fetchClients = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get("/clients");
+  // --- отримуємо список клієнтів ---
+  useEffect(() => {
+    const fetchClients = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get("/clients", {
+          params: { limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE },
+        });
 
-      console.log("API /clients:", res.data);
+        console.log("API /clients:", res.data);
 
-      const clients = Array.isArray(res.data) ? res.data : [];
+        setClients(res.data.rows || []);
+        setTotal(res.data.count || 0);
+      } catch (err) {
+        console.error("Помилка завантаження клієнтів", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      const normalized = [];
-      clients.forEach((client) => {
+    fetchClients();
+  }, [page]);
+
+  // --- перетворюємо клієнтів у рядки таблиці ---
+  useEffect(() => {
+    const tableRows = [];
+
+    clients.forEach((client) => {
+      const clientName = client.name;
+      const edrpou = client.edrpou;
+
+      // Якщо є стеки → рендеримо кожен окремо
+      if (client.stacks?.length) {
+        client.stacks.forEach((stack) => {
+          // Якщо є угоди → додаємо рядок на кожну угоду
+          if (client.deals?.length) {
+            client.deals.forEach((deal) => {
+              tableRows.push({
+                stack: stack.name,
+                clientName,
+                edrpou,
+                dealTitle: deal.title,
+                startDate: deal.start_date,
+                amount: deal.amount,
+                currency: deal.currency,
+                amountUah: deal.amount, // поки 1:1
+              });
+            });
+          } else {
+            // клієнт у стеці, але без угод
+            tableRows.push({
+              stack: stack.name,
+              clientName,
+              edrpou,
+              dealTitle: "-",
+              startDate: "-",
+              amount: "-",
+              currency: "-",
+              amountUah: "-",
+            });
+          }
+        });
+      } else {
+        // клієнт без стека
         if (client.deals?.length) {
           client.deals.forEach((deal) => {
-            normalized.push({
-              stack: safe(client.stacks?.map((s) => s.name).join(", ")),
-              clientName: safe(client.name),
-              edrpou: safe(client.edrpou),
-              dealTitle: safe(deal.title),
-              startDate: safe(deal.start_date),
-              amount: safe(deal.amount),
-              currency: safe(deal.currency),
-              amountUah: safe(deal.amount), // поки 1:1
+            tableRows.push({
+              stack: "-",
+              clientName,
+              edrpou,
+              dealTitle: deal.title,
+              startDate: deal.start_date,
+              amount: deal.amount,
+              currency: deal.currency,
+              amountUah: deal.amount,
             });
           });
         } else {
-          normalized.push({
-            stack: safe(client.stacks?.map((s) => s.name).join(", ")),
-            clientName: safe(client.name),
-            edrpou: safe(client.edrpou),
+          // клієнт без стека і без угод
+          tableRows.push({
+            stack: "-",
+            clientName,
+            edrpou,
             dealTitle: "-",
             startDate: "-",
             amount: "-",
@@ -51,145 +102,58 @@ const ClientsPage = () => {
             amountUah: "-",
           });
         }
-      });
+      }
+    });
 
-      setRows(normalized);
-    } catch (err) {
-      console.error("Помилка завантаження клієнтів", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setRows(tableRows);
+  }, [clients]);
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  // ======= фільтрація =======
-  const handleFilterChange = (column, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [column]: value.toLowerCase(),
-    }));
-  };
-
-  const filteredRows = rows.filter((row) =>
-    Object.entries(filters).every(([col, val]) =>
-      row[col]?.toString().toLowerCase().includes(val)
-    )
-  );
-
-  // ======= пагінація =======
-  const paginatedRows = filteredRows.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
-
-  const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
-
-  // ======= render =======
   if (loading) return <div>Завантаження...</div>;
 
   return (
     <div className={styles.container}>
-      <h2>Клієнти</h2>
+      <h2 className={styles.heading}>Клієнти</h2>
 
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>
-              Стек
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("stack", e.target.value)}
-              />
-            </th>
-            <th>
-              Назва
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("clientName", e.target.value)}
-              />
-            </th>
-            <th>
-              ЄДРПОУ
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("edrpou", e.target.value)}
-              />
-            </th>
-            <th>
-              Назва угоди
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("dealTitle", e.target.value)}
-              />
-            </th>
-            <th>
-              Дата угоди
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("startDate", e.target.value)}
-              />
-            </th>
-            <th>
-              Сума
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("amount", e.target.value)}
-              />
-            </th>
-            <th>
-              Валюта
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) => handleFilterChange("currency", e.target.value)}
-              />
-            </th>
-            <th>
-              Еквівалент в UAH
-              <input
-                type="text"
-                placeholder="Пошук..."
-                onChange={(e) =>
-                  handleFilterChange("amountUah", e.target.value)
-                }
-              />
-            </th>
+            <th>Стек</th>
+            <th>Назва</th>
+            <th>ЄДРПОУ</th>
+            <th>Назва угоди</th>
+            <th>Дата угоди</th>
+            <th>Сума</th>
+            <th>Валюта</th>
+            <th>Еквівалент в UAH</th>
           </tr>
         </thead>
         <tbody>
-          {paginatedRows.map((row, i) => (
+          {rows.map((r, i) => (
             <tr key={i}>
-              <td>{row.stack}</td>
-              <td>{row.clientName}</td>
-              <td>{row.edrpou}</td>
-              <td>{row.dealTitle}</td>
-              <td>{row.startDate}</td>
-              <td>{row.amount}</td>
-              <td>{row.currency}</td>
-              <td>{row.amountUah}</td>
+              <td>{r.stack}</td>
+              <td>{r.clientName}</td>
+              <td>{r.edrpou}</td>
+              <td>{r.dealTitle}</td>
+              <td>{r.startDate}</td>
+              <td>{r.amount}</td>
+              <td>{r.currency}</td>
+              <td>{r.amountUah}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* пагінація */}
       <div className={styles.pagination}>
-        <button disabled={page === 1} onClick={() => setPage(page - 1)}>
+        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
           Назад
         </button>
         <span>
-          {page} / {totalPages || 1}
+          {page} / {Math.ceil(total / PAGE_SIZE)}
         </span>
-        <button disabled={page === totalPages} onClick={() => setPage(page + 1)}>
+        <button
+          onClick={() => setPage((p) => (p < Math.ceil(total / PAGE_SIZE) ? p + 1 : p))}
+          disabled={page >= Math.ceil(total / PAGE_SIZE)}
+        >
           Вперед
         </button>
       </div>
