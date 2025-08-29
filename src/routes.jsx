@@ -6,6 +6,8 @@ import NoAccess from "./components/NoAccess";
 import AdminPanel from "./components/AdminPanel"; 
 import ProfilePage from "./pages/ProfilePage";
 import Layout from "./components/Layout"; 
+import ClientsPage from "./pages/ClientsPage";
+
 
 const AppRoutes = () => {
   return (
@@ -19,6 +21,7 @@ const AppRoutes = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/clients" element={<ClientsPage />} />
           </Route>
         </Route>
         {/* Сторінка без доступу */}

@@ -25,7 +25,7 @@ export const modules = [
   {
     name: "Клієнти",
     image: "/images/dog.jpg",
-    path: "",
+    path: "/clients",
     roles: ["sales", "admin", "expert", "chief", "commercialist"],
     description: "Відслідковування статусу заявок"
   },
