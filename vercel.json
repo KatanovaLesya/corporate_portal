@@ -1,5 +1,9 @@
 
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "build": {
+    "env": {
+      "NPM_CONFIG_CACHE": "false"
+    }
+  }
 }
-
