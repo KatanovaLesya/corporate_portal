@@ -1,4 +1,3 @@
-// src/pages/ClientsPage.jsx
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
@@ -7,8 +6,8 @@ import styles from "./ClientsPage.module.css";
 const PAGE_SIZE = 50;
 
 const ClientsPage = () => {
-  const [allClients, setAllClients] = useState([]); // усі клієнти
-  const [rows, setRows] = useState([]);             // перетворені рядки
+  const [allClients, setAllClients] = useState([]); // всі клієнти з бекенду
+  const [rows, setRows] = useState([]);             // нормалізовані рядки
   const [filteredRows, setFilteredRows] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -25,12 +24,12 @@ const ClientsPage = () => {
     amountUah: null,
   });
 
-  // ======= Завантаження всіх клієнтів =======
+  // ===== Завантажуємо ВСІХ клієнтів без пагінації =====
   useEffect(() => {
     const fetchClients = async () => {
       try {
         setLoading(true);
-        const res = await api.get("/clients"); // без limit/offset
+        const res = await api.get("/clients"); // ⚡ без limit/offset
         setAllClients(res.data.rows || []);
       } catch (err) {
         console.error("Помилка завантаження клієнтів", err);
@@ -41,7 +40,7 @@ const ClientsPage = () => {
     fetchClients();
   }, []);
 
-  // ======= Перетворення клієнтів у рядки таблиці =======
+  // ===== Перетворюємо клієнтів у рядки таблиці =====
   useEffect(() => {
     const tableRows = [];
 
@@ -107,10 +106,10 @@ const ClientsPage = () => {
     });
 
     setRows(tableRows);
-    setFilteredRows(tableRows); // початково всі
+    setFilteredRows(tableRows);
   }, [allClients]);
 
-  // ======= Застосування фільтрів =======
+  // ===== Застосування фільтрів =====
   useEffect(() => {
     let temp = [...rows];
 
@@ -135,7 +134,7 @@ const ClientsPage = () => {
     return unique.map((v) => ({ value: v, label: v }));
   };
 
-  // ======= Пагінація =======
+  // ===== Пагінація =====
   const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
   const paginatedRows = filteredRows.slice(
     (page - 1) * PAGE_SIZE,
