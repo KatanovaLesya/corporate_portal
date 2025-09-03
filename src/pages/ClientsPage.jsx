@@ -4,30 +4,26 @@ import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
 
+// розмір сторінки
 const PAGE_SIZE = 50;
 
 const ClientsPage = () => {
   const [clients, setClients] = useState([]);
-  const [total, setTotal] = useState(0);
+  const [stacks, setStacks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-
-  // Фільтри
+  const [total, setTotal] = useState(0);
   const [filters, setFilters] = useState({
-    stack: "",
-    name: "",
+    stackId: null,
+    clientName: "",
     edrpou: "",
     dealTitle: "",
     startDate: "",
     amount: "",
     currency: "",
-    amountUah: ""
   });
 
-  const [stacks, setStacks] = useState([]);
-  const [currencies, setCurrencies] = useState([]);
-
-  // --- Завантажуємо клієнтів ---
+  // ---- завантаження клієнтів ----
   const fetchClients = async () => {
     try {
       setLoading(true);
@@ -35,46 +31,45 @@ const ClientsPage = () => {
         params: {
           page,
           limit: PAGE_SIZE,
-          ...filters
-        }
+          ...filters,
+        },
       });
+
       setClients(res.data.rows || []);
       setTotal(res.data.count || 0);
     } catch (err) {
-      console.error("Помилка завантаження клієнтів", err);
+      console.error("Помилка завантаження клієнтів:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  // --- Завантажуємо стеки ---
+  // ---- завантаження стеків ----
   const fetchStacks = async () => {
     try {
       const res = await api.get("/stacks");
-      setStacks(res.data.map(s => ({ value: s.name, label: s.name })));
+      const options = res.data.map((s) => ({ value: s.id, label: s.name }));
+      setStacks(options);
     } catch (err) {
-      console.error("Помилка завантаження стеків", err);
+      console.error("Помилка завантаження стеків:", err);
     }
   };
 
-  // --- Завантажуємо валюти ---
-  const fetchCurrencies = async () => {
-    try {
-      const res = await api.get("/currencies");
-      setCurrencies(res.data.map(c => ({ value: c.code, label: c.code })));
-    } catch (err) {
-      console.error("Помилка завантаження валют", err);
-    }
-  };
+  // при першому завантаженні
+  useEffect(() => {
+    fetchStacks();
+  }, []);
 
+  // при зміні сторінки або фільтрів
   useEffect(() => {
     fetchClients();
   }, [page, filters]);
 
-  useEffect(() => {
-    fetchStacks();
-    fetchCurrencies();
-  }, []);
+  // ---- хендлери ----
+  const handleFilterChange = (field, value) => {
+    setPage(1); // повертаємось на 1 сторінку при фільтрації
+    setFilters((prev) => ({ ...prev, [field]: value }));
+  };
 
   const totalPages = Math.ceil(total / PAGE_SIZE);
 
@@ -82,152 +77,116 @@ const ClientsPage = () => {
     <div className={styles.container}>
       <h2>Клієнти</h2>
 
-      {/* Таблиця */}
       {loading ? (
         <p>Завантаження...</p>
       ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>
-                Стек
-                <Select
-                  options={stacks}
-                  isClearable
-                  placeholder="Пошук..."
-                  onChange={(opt) =>
-                    setFilters({ ...filters, stack: opt ? opt.value : "" })
-                  }
-                />
-              </th>
-              <th>
-                Назва
-                <input
-                  type="text"
-                  placeholder="Пошук..."
-                  value={filters.name}
-                  onChange={(e) =>
-                    setFilters({ ...filters, name: e.target.value })
-                  }
-                />
-              </th>
-              <th>
-                ЄДРПОУ
-                <input
-                  type="text"
-                  placeholder="Пошук..."
-                  value={filters.edrpou}
-                  onChange={(e) =>
-                    setFilters({ ...filters, edrpou: e.target.value })
-                  }
-                />
-              </th>
-              <th>
-                Назва угоди
-                <input
-                  type="text"
-                  placeholder="Пошук..."
-                  value={filters.dealTitle}
-                  onChange={(e) =>
-                    setFilters({ ...filters, dealTitle: e.target.value })
-                  }
-                />
-              </th>
-              <th>
-                Дата угоди
-                <input
-                  type="date"
-                  value={filters.startDate}
-                  onChange={(e) =>
-                    setFilters({ ...filters, startDate: e.target.value })
-                  }
-                />
-              </th>
-              <th>
-                Сума
-                <input
-                  type="number"
-                  placeholder="Пошук..."
-                  value={filters.amount}
-                  onChange={(e) =>
-                    setFilters({ ...filters, amount: e.target.value })
-                  }
-                />
-              </th>
-              <th>
-                Валюта
-                <Select
-                  options={currencies}
-                  isClearable
-                  placeholder="Пошук..."
-                  onChange={(opt) =>
-                    setFilters({ ...filters, currency: opt ? opt.value : "" })
-                  }
-                />
-              </th>
-              <th>
-                Еквівалент в UAH
-                <input
-                  type="number"
-                  placeholder="Пошук..."
-                  value={filters.amountUah}
-                  onChange={(e) =>
-                    setFilters({ ...filters, amountUah: e.target.value })
-                  }
-                />
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {clients.length === 0 ? (
+        <>
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <td colSpan="8">Немає даних</td>
+                <th>
+                  Стек
+                  <Select
+                    options={stacks}
+                    value={stacks.find((s) => s.value === filters.stackId) || null}
+                    onChange={(val) => handleFilterChange("stackId", val ? val.value : null)}
+                    placeholder="Пошук..."
+                    isClearable
+                  />
+                </th>
+                <th>
+                  Назва
+                  <input
+                    type="text"
+                    placeholder="Пошук..."
+                    value={filters.clientName}
+                    onChange={(e) => handleFilterChange("clientName", e.target.value)}
+                  />
+                </th>
+                <th>
+                  ЄДРПОУ
+                  <input
+                    type="text"
+                    placeholder="Пошук..."
+                    value={filters.edrpou}
+                    onChange={(e) => handleFilterChange("edrpou", e.target.value)}
+                  />
+                </th>
+                <th>
+                  Назва угоди
+                  <input
+                    type="text"
+                    placeholder="Пошук..."
+                    value={filters.dealTitle}
+                    onChange={(e) => handleFilterChange("dealTitle", e.target.value)}
+                  />
+                </th>
+                <th>
+                  Дата угоди
+                  <input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) => handleFilterChange("startDate", e.target.value)}
+                  />
+                </th>
+                <th>
+                  Сума
+                  <input
+                    type="text"
+                    placeholder="Пошук..."
+                    value={filters.amount}
+                    onChange={(e) => handleFilterChange("amount", e.target.value)}
+                  />
+                </th>
+                <th>
+                  Валюта
+                  <input
+                    type="text"
+                    placeholder="Пошук..."
+                    value={filters.currency}
+                    onChange={(e) => handleFilterChange("currency", e.target.value)}
+                  />
+                </th>
               </tr>
-            ) : (
-              clients.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.stacks?.map((s) => s.name).join(", ") || "-"}</td>
-                  <td>{c.name}</td>
-                  <td>{c.edrpou}</td>
-                  <td>
-                    {c.deals?.map((d) => d.title).join(", ") || "-"}
-                  </td>
-                  <td>
-                    {c.deals?.map((d) => d.start_date).join(", ") || "-"}
-                  </td>
-                  <td>
-                    {c.deals?.map((d) => d.amount).join(", ") || "-"}
-                  </td>
-                  <td>
-                    {c.deals?.map((d) => d.currency).join(", ") || "-"}
-                  </td>
-                  <td>
-                    {c.deals
-                      ?.map((d) => d.amount) // тут поки 1:1 як ти казала
-                      .join(", ") || "-"}
-                  </td>
+            </thead>
+            <tbody>
+              {clients.length > 0 ? (
+                clients.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.stacks?.map((s) => s.name).join(", ") || "-"}</td>
+                    <td>{c.name}</td>
+                    <td>{c.edrpou}</td>
+                    <td>{c.deals?.map((d) => d.title).join(", ") || "-"}</td>
+                    <td>{c.deals?.map((d) => d.start_date).join(", ") || "-"}</td>
+                    <td>{c.deals?.map((d) => d.amount).join(", ") || "-"}</td>
+                    <td>{c.deals?.map((d) => d.currency).join(", ") || "-"}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7">Немає даних</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
+              )}
+            </tbody>
+          </table>
 
-      {/* Пагінація */}
-      <div className={styles.pagination}>
-        <button disabled={page === 1} onClick={() => setPage(page - 1)}>
-          Назад
-        </button>
-        <span>
-          {page} / {totalPages || 1}
-        </span>
-        <button
-          disabled={page === totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Вперед
-        </button>
-      </div>
+          {/* ---- Пагінація ---- */}
+          <div className={styles.pagination}>
+            <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
+              Назад
+            </button>
+            <span>
+              {page} / {totalPages || 1}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Вперед
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
