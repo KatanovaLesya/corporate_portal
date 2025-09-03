@@ -6,11 +6,12 @@ import Select from "react-select";
 const PAGE_SIZE = 50;
 
 export default function ClientsPage() {
-  const [clients, setClients] = useState([]);
+  const [rows, setRows] = useState([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  const [stacks, setStacks] = useState([]);
+  // --- фільтри ---
   const [filters, setFilters] = useState({
     stack: "",
     name: "",
@@ -19,61 +20,46 @@ export default function ClientsPage() {
     startDate: "",
     amount: "",
     currency: "",
+    amountUah: "",
   });
 
-  const [loading, setLoading] = useState(false);
-
-  // --- завантаження клієнтів ---
-  const fetchClients = async () => {
+  // --- завантаження клієнтів з бекенду ---
+  async function fetchClients() {
     try {
       setLoading(true);
+
       const res = await api.get("/clients", {
         params: {
-          page,
           limit: PAGE_SIZE,
+          offset: (page - 1) * PAGE_SIZE,
           ...filters,
         },
       });
 
-      const data = res.data;
-      setClients(data.rows || []);
-      setCount(data.count || 0);
+      setRows(res.data.rows || []);
+      setCount(res.data.count || 0);
     } catch (err) {
-      console.error("Помилка завантаження клієнтів –", err);
+      console.error("Помилка завантаження клієнтів:", err);
     } finally {
       setLoading(false);
     }
-  };
-
-  // --- завантаження стеків ---
-  const fetchStacks = async () => {
-    try {
-      const res = await api.get("/stacks");
-
-      // якщо бекенд повертає {rows: [...]}, дістаємо rows
-      const stacksData = Array.isArray(res.data)
-        ? res.data
-        : res.data?.rows || [];
-
-      setStacks(stacksData);
-    } catch (err) {
-      console.error("Помилка завантаження стеків –", err);
-      setStacks([]); // fallback
-    }
-  };
+  }
 
   useEffect(() => {
     fetchClients();
   }, [page, filters]);
 
-  useEffect(() => {
-    fetchStacks();
-  }, []);
-
-  const handleFilterChange = (field, value) => {
-    setPage(1); // повертаємо на першу сторінку при фільтрації
-    setFilters((prev) => ({ ...prev, [field]: value }));
+  // --- обробник зміни фільтра ---
+  const handleFilterChange = (key, value) => {
+    setPage(1); // завжди починаємо з 1-ї сторінки
+    setFilters((prev) => ({
+      ...prev,
+      [key]: value || "",
+    }));
   };
+
+  // --- кількість сторінок ---
+  const totalPages = Math.ceil(count / PAGE_SIZE);
 
   return (
     <div>
@@ -87,114 +73,97 @@ export default function ClientsPage() {
             <th>
               Стек
               <Select
-                isClearable
-                placeholder="Пошук..."
-                options={stacks.map((s) => ({
-                  value: s.id,
-                  label: s.name,
+                options={[...new Set(rows.map((r) => r.stack))].map((s) => ({
+                  value: s,
+                  label: s,
                 }))}
-                onChange={(opt) =>
-                  handleFilterChange("stack", opt ? opt.value : "")
-                }
+                onChange={(opt) => handleFilterChange("stack", opt?.value)}
+                isClearable
               />
             </th>
             <th>
               Назва
               <input
                 placeholder="Пошук..."
-                onChange={(e) =>
-                  handleFilterChange("name", e.target.value)
-                }
+                value={filters.name}
+                onChange={(e) => handleFilterChange("name", e.target.value)}
               />
             </th>
             <th>
               ЄДРПОУ
               <input
                 placeholder="Пошук..."
-                onChange={(e) =>
-                  handleFilterChange("edrpou", e.target.value)
-                }
+                value={filters.edrpou}
+                onChange={(e) => handleFilterChange("edrpou", e.target.value)}
               />
             </th>
             <th>
               Назва угоди
               <input
                 placeholder="Пошук..."
-                onChange={(e) =>
-                  handleFilterChange("dealTitle", e.target.value)
-                }
+                value={filters.dealTitle}
+                onChange={(e) => handleFilterChange("dealTitle", e.target.value)}
               />
             </th>
             <th>
               Дата угоди
               <input
                 type="date"
-                onChange={(e) =>
-                  handleFilterChange("startDate", e.target.value)
-                }
+                value={filters.startDate}
+                onChange={(e) => handleFilterChange("startDate", e.target.value)}
               />
             </th>
             <th>
               Сума
               <input
                 placeholder="Пошук..."
-                onChange={(e) =>
-                  handleFilterChange("amount", e.target.value)
-                }
+                value={filters.amount}
+                onChange={(e) => handleFilterChange("amount", e.target.value)}
               />
             </th>
             <th>
               Валюта
               <input
                 placeholder="Пошук..."
-                onChange={(e) =>
-                  handleFilterChange("currency", e.target.value)
-                }
+                value={filters.currency}
+                onChange={(e) => handleFilterChange("currency", e.target.value)}
               />
             </th>
-            <th>Еквівалент в UAH</th>
+            <th>
+              Еквівалент в UAH
+              <input
+                placeholder="Пошук..."
+                value={filters.amountUah}
+                onChange={(e) => handleFilterChange("amountUah", e.target.value)}
+              />
+            </th>
           </tr>
         </thead>
         <tbody>
-          {clients.map((c) => (
-            <tr key={c.id}>
-              <td>{c.stacks?.map((s) => s.name).join(", ") || "-"}</td>
-              <td>{c.name}</td>
-              <td>{c.edrpou}</td>
-              <td>{c.deals?.map((d) => d.title).join(", ") || "-"}</td>
-              <td>{c.deals?.map((d) => d.start_date).join(", ") || "-"}</td>
-              <td>{c.deals?.map((d) => d.amount).join(", ") || "-"}</td>
-              <td>{c.deals?.map((d) => d.currency).join(", ") || "-"}</td>
-              <td>
-                {c.deals
-                  ?.map((d) =>
-                    (d.amount || 0).toLocaleString("uk-UA", {
-                      style: "currency",
-                      currency: "UAH",
-                    })
-                  )
-                  .join(", ") || "-"}
-              </td>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              <td>{row.stack || "-"}</td>
+              <td>{row.name}</td>
+              <td>{row.edrpou}</td>
+              <td>{row.dealTitle || "-"}</td>
+              <td>{row.startDate || "-"}</td>
+              <td>{row.amount || "-"}</td>
+              <td>{row.currency || "-"}</td>
+              <td>{row.amountUah || "-"}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* --- Пагінація --- */}
-      <div>
-        <button
-          disabled={page === 1}
-          onClick={() => setPage((p) => Math.max(1, p - 1))}
-        >
+      {/* --- пагінація --- */}
+      <div style={{ marginTop: "10px" }}>
+        <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
           Назад
         </button>
         <span>
-          {page} / {Math.ceil(count / PAGE_SIZE) || 1}
+          {page} / {totalPages || 1}
         </span>
-        <button
-          disabled={page >= Math.ceil(count / PAGE_SIZE)}
-          onClick={() => setPage((p) => p + 1)}
-        >
+        <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
           Вперед
         </button>
       </div>
