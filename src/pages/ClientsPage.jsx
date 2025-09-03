@@ -1,4 +1,3 @@
-// src/pages/ClientsPage.jsx
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
@@ -7,203 +6,245 @@ import styles from "./ClientsPage.module.css";
 const PAGE_SIZE = 50;
 
 const ClientsPage = () => {
-  const [allClients, setAllClients] = useState([]); // усі клієнти
-  const [rows, setRows] = useState([]);             // перетворені рядки
-  const [filteredRows, setFilteredRows] = useState([]); 
-  const [loading, setLoading] = useState(true);
+  const [clients, setClients] = useState([]);
+  const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
-  // фільтри
+  // 🔹 Фільтри
   const [filters, setFilters] = useState({
     stack: null,
-    clientName: null,
-    edrpou: null,
-    dealTitle: null,
-    startDate: null,
-    amount: null,
-    currency: null,
-    amountUah: null,
+    name: "",
+    edrpou: "",
+    dealTitle: "",
+    startDate: "",
+    amount: "",
+    currency: "",
   });
 
-  // ======= Завантаження всіх клієнтів =======
+  const [stacks, setStacks] = useState([]);
+  const [currencies, setCurrencies] = useState([]);
+
+  // === Завантаження клієнтів ===
+  const fetchClients = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/clients", {
+        params: {
+          page,
+          limit: PAGE_SIZE,
+          stack: filters.stack?.value || "",
+          name: filters.name || "",
+          edrpou: filters.edrpou || "",
+          dealTitle: filters.dealTitle || "",
+          startDate: filters.startDate || "",
+          amount: filters.amount || "",
+          currency: filters.currency || "",
+        },
+      });
+
+      setClients(res.data.rows || []);
+      setTotal(res.data.count || 0);
+    } catch (err) {
+      console.error("Помилка завантаження клієнтів:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // === Завантаження стеків ===
+  const fetchStacks = async () => {
+    try {
+      const res = await api.get("/stacks");
+      const stacksArray = Array.isArray(res.data)
+        ? res.data
+        : res.data.rows || [];
+
+      const options = stacksArray.map((s) => ({
+        value: s.id,
+        label: s.name,
+      }));
+      setStacks(options);
+    } catch (err) {
+      console.error("Помилка завантаження стеків:", err);
+    }
+  };
+
+  // === Завантаження валют ===
+  const fetchCurrencies = async () => {
+    try {
+      const res = await api.get("/currencies");
+      const currencyArray = Array.isArray(res.data)
+        ? res.data
+        : res.data.rows || [];
+
+      const options = currencyArray.map((c) => ({
+        value: c.code,
+        label: c.code,
+      }));
+      setCurrencies(options);
+    } catch (err) {
+      console.error("Помилка завантаження валют:", err);
+    }
+  };
+
+  // === Виклики ===
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get("/clients"); // без limit/offset
-        setAllClients(res.data.rows || []);
-      } catch (err) {
-        console.error("Помилка завантаження клієнтів", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchClients();
+    fetchStacks();
+    fetchCurrencies();
   }, []);
 
-  // ======= Перетворення клієнтів у рядки таблиці =======
   useEffect(() => {
-    const tableRows = [];
+    fetchClients();
+  }, [page, filters]);
 
-    allClients.forEach((client) => {
-      const clientName = client.name;
-      const edrpou = client.edrpou;
-
-      if (client.stacks?.length) {
-        client.stacks.forEach((stack) => {
-          if (client.deals?.length) {
-            client.deals.forEach((deal) => {
-              tableRows.push({
-                stack: stack.name,
-                clientName,
-                edrpou,
-                dealTitle: deal.title,
-                startDate: deal.start_date,
-                amount: deal.amount,
-                currency: deal.currency,
-                amountUah: deal.amount,
-              });
-            });
-          } else {
-            tableRows.push({
-              stack: stack.name,
-              clientName,
-              edrpou,
-              dealTitle: "-",
-              startDate: "-",
-              amount: "-",
-              currency: "-",
-              amountUah: "-",
-            });
-          }
-        });
-      } else {
-        if (client.deals?.length) {
-          client.deals.forEach((deal) => {
-            tableRows.push({
-              stack: "-",
-              clientName,
-              edrpou,
-              dealTitle: deal.title,
-              startDate: deal.start_date,
-              amount: deal.amount,
-              currency: deal.currency,
-              amountUah: deal.amount,
-            });
-          });
-        } else {
-          tableRows.push({
-            stack: "-",
-            clientName,
-            edrpou,
-            dealTitle: "-",
-            startDate: "-",
-            amount: "-",
-            currency: "-",
-            amountUah: "-",
-          });
-        }
-      }
-    });
-
-    setRows(tableRows);
-    setFilteredRows(tableRows); // початково всі
-  }, [allClients]);
-
-  // ======= Застосування фільтрів =======
-  useEffect(() => {
-    let temp = [...rows];
-
-    Object.keys(filters).forEach((key) => {
-      if (filters[key]) {
-        temp = temp.filter((r) =>
-          r[key]?.toString().toLowerCase().includes(filters[key].toLowerCase())
-        );
-      }
-    });
-
-    setFilteredRows(temp);
-    setPage(1); // скидати на першу сторінку після фільтрації
-  }, [filters, rows]);
-
-  const handleFilterChange = (col, option) => {
-    setFilters((prev) => ({ ...prev, [col]: option ? option.value : null }));
+  // === Хендлери ===
+  const handleFilterChange = (field, value) => {
+    setPage(1); // 🔹 Завжди повертатись на першу сторінку при зміні фільтра
+    setFilters((prev) => ({ ...prev, [field]: value }));
   };
 
-  const getOptions = (col) => {
-    const unique = [...new Set(rows.map((r) => r[col] || "-"))];
-    return unique.map((v) => ({ value: v, label: v }));
-  };
-
-  // ======= Пагінація =======
-  const totalPages = Math.ceil(filteredRows.length / PAGE_SIZE);
-  const paginatedRows = filteredRows.slice(
-    (page - 1) * PAGE_SIZE,
-    page * PAGE_SIZE
-  );
-
-  if (loading) return <div>Завантаження...</div>;
+  // === Розрахунок сторінок ===
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.heading}>Клієнти</h2>
+    <div className={styles.wrapper}>
+      <h2>Клієнти</h2>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Стек</th>
-            <th>Назва</th>
-            <th>ЄДРПОУ</th>
-            <th>Назва угоди</th>
-            <th>Дата угоди</th>
-            <th>Сума</th>
-            <th>Валюта</th>
-            <th>Еквівалент в UAH</th>
-          </tr>
-          <tr>
-            {Object.keys(filters).map((col) => (
-              <th key={col}>
-                <Select
-                  options={getOptions(col)}
-                  isClearable
-                  placeholder="Пошук..."
-                  value={filters[col] ? { value: filters[col], label: filters[col] } : null}
-                  onChange={(opt) => handleFilterChange(col, opt)}
-                />
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {paginatedRows.map((r, i) => (
-            <tr key={i}>
-              <td>{r.stack}</td>
-              <td>{r.clientName}</td>
-              <td>{r.edrpou}</td>
-              <td>{r.dealTitle}</td>
-              <td>{r.startDate}</td>
-              <td>{r.amount}</td>
-              <td>{r.currency}</td>
-              <td>{r.amountUah}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {loading ? (
+        <p>Завантаження...</p>
+      ) : (
+        <>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>
+                  Стек
+                  <Select
+                    options={stacks}
+                    value={filters.stack}
+                    onChange={(v) => handleFilterChange("stack", v)}
+                    isClearable
+                    placeholder="Пошук..."
+                  />
+                </th>
+                <th>
+                  Назва
+                  <input
+                    type="text"
+                    value={filters.name}
+                    onChange={(e) =>
+                      handleFilterChange("name", e.target.value)
+                    }
+                    placeholder="Пошук..."
+                  />
+                </th>
+                <th>
+                  ЄДРПОУ
+                  <input
+                    type="text"
+                    value={filters.edrpou}
+                    onChange={(e) =>
+                      handleFilterChange("edrpou", e.target.value)
+                    }
+                    placeholder="Пошук..."
+                  />
+                </th>
+                <th>
+                  Назва угоди
+                  <input
+                    type="text"
+                    value={filters.dealTitle}
+                    onChange={(e) =>
+                      handleFilterChange("dealTitle", e.target.value)
+                    }
+                    placeholder="Пошук..."
+                  />
+                </th>
+                <th>
+                  Дата угоди
+                  <input
+                    type="date"
+                    value={filters.startDate}
+                    onChange={(e) =>
+                      handleFilterChange("startDate", e.target.value)
+                    }
+                  />
+                </th>
+                <th>
+                  Сума
+                  <input
+                    type="number"
+                    value={filters.amount}
+                    onChange={(e) =>
+                      handleFilterChange("amount", e.target.value)
+                    }
+                    placeholder="Пошук..."
+                  />
+                </th>
+                <th>
+                  Валюта
+                  <Select
+                    options={currencies}
+                    value={filters.currency}
+                    onChange={(v) => handleFilterChange("currency", v?.value)}
+                    isClearable
+                    placeholder="Пошук..."
+                  />
+                </th>
+                <th>Еквівалент в UAH</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clients.length > 0 ? (
+                clients.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.stacks?.map((s) => s.name).join(", ") || "-"}</td>
+                    <td>{c.name}</td>
+                    <td>{c.edrpou}</td>
+                    <td>{c.deals?.map((d) => d.title).join(", ") || "-"}</td>
+                    <td>{c.deals?.map((d) => d.start_date).join(", ") || "-"}</td>
+                    <td>{c.deals?.map((d) => d.amount).join(", ") || "-"}</td>
+                    <td>{c.deals?.map((d) => d.currency).join(", ") || "-"}</td>
+                    <td>
+                      {c.deals
+                        ?.map((d) =>
+                          d.currency === "UAH"
+                            ? d.amount
+                            : Math.round(d.amount * 1) // тимчасово курс 1:1
+                        )
+                        .join(", ") || "-"}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="8">Дані відсутні</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
 
-      <div className={styles.pagination}>
-        <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1}>
-          Назад
-        </button>
-        <span>
-          {page} / {totalPages || 1}
-        </span>
-        <button
-          onClick={() => setPage((p) => (p < totalPages ? p + 1 : p))}
-          disabled={page >= totalPages}
-        >
-          Вперед
-        </button>
-      </div>
+          {/* Пагінація */}
+          <div className={styles.pagination}>
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Назад
+            </button>
+            <span>
+              {page} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Вперед
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
