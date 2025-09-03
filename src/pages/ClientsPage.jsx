@@ -1,29 +1,44 @@
+// src/pages/ClientsPage.jsx
 import { useEffect, useState } from "react";
-import AsyncSelect from "react-select/async";
 import api from "../services/api";
+import Select from "react-select";
 import styles from "./ClientsPage.module.css";
 
 const PAGE_SIZE = 50;
 
 const ClientsPage = () => {
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
+  const [clients, setClients] = useState([]);
   const [total, setTotal] = useState(0);
-  const [filters, setFilters] = useState({});
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  // --- функція завантаження клієнтів ---
+  // Фільтри
+  const [filters, setFilters] = useState({
+    stack: "",
+    name: "",
+    edrpou: "",
+    dealTitle: "",
+    startDate: "",
+    amount: "",
+    currency: "",
+    amountUah: ""
+  });
+
+  const [stacks, setStacks] = useState([]);
+  const [currencies, setCurrencies] = useState([]);
+
+  // --- Завантажуємо клієнтів ---
   const fetchClients = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const res = await api.get("/clients", {
         params: {
           page,
           limit: PAGE_SIZE,
-          ...filters, // фільтри йдуть у бекенд
-        },
+          ...filters
+        }
       });
-      setRows(res.data.rows || []);
+      setClients(res.data.rows || []);
       setTotal(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів", err);
@@ -32,165 +47,183 @@ const ClientsPage = () => {
     }
   };
 
+  // --- Завантажуємо стеки ---
+  const fetchStacks = async () => {
+    try {
+      const res = await api.get("/stacks");
+      setStacks(res.data.map(s => ({ value: s.name, label: s.name })));
+    } catch (err) {
+      console.error("Помилка завантаження стеків", err);
+    }
+  };
+
+  // --- Завантажуємо валюти ---
+  const fetchCurrencies = async () => {
+    try {
+      const res = await api.get("/currencies");
+      setCurrencies(res.data.map(c => ({ value: c.code, label: c.code })));
+    } catch (err) {
+      console.error("Помилка завантаження валют", err);
+    }
+  };
+
   useEffect(() => {
     fetchClients();
   }, [page, filters]);
 
-  // --- генератори опцій для колонок ---
-  const loadStacks = async (inputValue) => {
-    try {
-      const res = await api.get("/stacks", { params: { q: inputValue } });
-      return res.data.map((s) => ({ value: s.name, label: s.name }));
-    } catch (err) {
-      console.error("Помилка завантаження стеків", err);
-      return [];
-    }
-  };
+  useEffect(() => {
+    fetchStacks();
+    fetchCurrencies();
+  }, []);
 
-  const loadClientNames = async (inputValue) => {
-    try {
-      const res = await api.get("/clients", { params: { name: inputValue, limit: 20 } });
-      return res.data.rows.map((c) => ({ value: c.name, label: c.name }));
-    } catch {
-      return [];
-    }
-  };
-
-  const loadEdrpou = async (inputValue) => {
-    try {
-      const res = await api.get("/clients", { params: { edrpou: inputValue, limit: 20 } });
-      return res.data.rows.map((c) => ({ value: c.edrpou, label: c.edrpou }));
-    } catch {
-      return [];
-    }
-  };
-
-  const loadDeals = async (inputValue) => {
-    try {
-      const res = await api.get("/deals", { params: { title: inputValue, limit: 20 } });
-      return res.data.map((d) => ({ value: d.title, label: d.title }));
-    } catch {
-      return [];
-    }
-  };
-
-  const loadCurrencies = async (inputValue) => {
-    try {
-      const res = await api.get("/currencies", { params: { q: inputValue } });
-      return res.data.map((c) => ({ value: c.code, label: c.code }));
-    } catch {
-      return [];
-    }
-  };
-
-  // --- обробник змін фільтра ---
-  const handleFilterChange = (field, option) => {
-    setPage(1); // скидати на першу сторінку
-    setFilters((prev) => ({
-      ...prev,
-      [field]: option ? option.value : undefined,
-    }));
-  };
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className={styles.container}>
       <h2>Клієнти</h2>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadStacks}
-                onChange={(opt) => handleFilterChange("stack", opt)}
-                placeholder="Пошук..."
-                isClearable
-              />
-            </th>
-            <th>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadClientNames}
-                onChange={(opt) => handleFilterChange("name", opt)}
-                placeholder="Пошук..."
-                isClearable
-              />
-            </th>
-            <th>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadEdrpou}
-                onChange={(opt) => handleFilterChange("edrpou", opt)}
-                placeholder="Пошук..."
-                isClearable
-              />
-            </th>
-            <th>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadDeals}
-                onChange={(opt) => handleFilterChange("deal", opt)}
-                placeholder="Пошук..."
-                isClearable
-              />
-            </th>
-            <th>Дата угоди</th>
-            <th>Сума</th>
-            <th>
-              <AsyncSelect
-                cacheOptions
-                defaultOptions
-                loadOptions={loadCurrencies}
-                onChange={(opt) => handleFilterChange("currency", opt)}
-                placeholder="Пошук..."
-                isClearable
-              />
-            </th>
-            <th>Еквівалент в UAH</th>
-          </tr>
-        </thead>
-        <tbody>
-          {loading ? (
+      {/* Таблиця */}
+      {loading ? (
+        <p>Завантаження...</p>
+      ) : (
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <td colSpan={8}>Завантаження...</td>
+              <th>
+                Стек
+                <Select
+                  options={stacks}
+                  isClearable
+                  placeholder="Пошук..."
+                  onChange={(opt) =>
+                    setFilters({ ...filters, stack: opt ? opt.value : "" })
+                  }
+                />
+              </th>
+              <th>
+                Назва
+                <input
+                  type="text"
+                  placeholder="Пошук..."
+                  value={filters.name}
+                  onChange={(e) =>
+                    setFilters({ ...filters, name: e.target.value })
+                  }
+                />
+              </th>
+              <th>
+                ЄДРПОУ
+                <input
+                  type="text"
+                  placeholder="Пошук..."
+                  value={filters.edrpou}
+                  onChange={(e) =>
+                    setFilters({ ...filters, edrpou: e.target.value })
+                  }
+                />
+              </th>
+              <th>
+                Назва угоди
+                <input
+                  type="text"
+                  placeholder="Пошук..."
+                  value={filters.dealTitle}
+                  onChange={(e) =>
+                    setFilters({ ...filters, dealTitle: e.target.value })
+                  }
+                />
+              </th>
+              <th>
+                Дата угоди
+                <input
+                  type="date"
+                  value={filters.startDate}
+                  onChange={(e) =>
+                    setFilters({ ...filters, startDate: e.target.value })
+                  }
+                />
+              </th>
+              <th>
+                Сума
+                <input
+                  type="number"
+                  placeholder="Пошук..."
+                  value={filters.amount}
+                  onChange={(e) =>
+                    setFilters({ ...filters, amount: e.target.value })
+                  }
+                />
+              </th>
+              <th>
+                Валюта
+                <Select
+                  options={currencies}
+                  isClearable
+                  placeholder="Пошук..."
+                  onChange={(opt) =>
+                    setFilters({ ...filters, currency: opt ? opt.value : "" })
+                  }
+                />
+              </th>
+              <th>
+                Еквівалент в UAH
+                <input
+                  type="number"
+                  placeholder="Пошук..."
+                  value={filters.amountUah}
+                  onChange={(e) =>
+                    setFilters({ ...filters, amountUah: e.target.value })
+                  }
+                />
+              </th>
             </tr>
-          ) : rows.length === 0 ? (
-            <tr>
-              <td colSpan={8}>Немає даних</td>
-            </tr>
-          ) : (
-            rows.map((r) => (
-              <tr key={r.id}>
-                <td>{r.stack || "-"}</td>
-                <td>{r.name}</td>
-                <td>{r.edrpou}</td>
-                <td>{r.dealTitle || "-"}</td>
-                <td>{r.startDate || "-"}</td>
-                <td>{r.amount || "-"}</td>
-                <td>{r.currency || "-"}</td>
-                <td>{r.amountUah || "-"}</td>
+          </thead>
+          <tbody>
+            {clients.length === 0 ? (
+              <tr>
+                <td colSpan="8">Немає даних</td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              clients.map((c) => (
+                <tr key={c.id}>
+                  <td>{c.stacks?.map((s) => s.name).join(", ") || "-"}</td>
+                  <td>{c.name}</td>
+                  <td>{c.edrpou}</td>
+                  <td>
+                    {c.deals?.map((d) => d.title).join(", ") || "-"}
+                  </td>
+                  <td>
+                    {c.deals?.map((d) => d.start_date).join(", ") || "-"}
+                  </td>
+                  <td>
+                    {c.deals?.map((d) => d.amount).join(", ") || "-"}
+                  </td>
+                  <td>
+                    {c.deals?.map((d) => d.currency).join(", ") || "-"}
+                  </td>
+                  <td>
+                    {c.deals
+                      ?.map((d) => d.amount) // тут поки 1:1 як ти казала
+                      .join(", ") || "-"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      )}
 
-      {/* пагінація */}
+      {/* Пагінація */}
       <div className={styles.pagination}>
-        <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}>
+        <button disabled={page === 1} onClick={() => setPage(page - 1)}>
           Назад
         </button>
         <span>
-          {page} / {Math.ceil(total / PAGE_SIZE)}
+          {page} / {totalPages || 1}
         </span>
         <button
-          disabled={page >= Math.ceil(total / PAGE_SIZE)}
-          onClick={() => setPage((p) => p + 1)}
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
         >
           Вперед
         </button>
