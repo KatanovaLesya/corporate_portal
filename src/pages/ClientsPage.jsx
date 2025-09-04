@@ -1,4 +1,3 @@
-// src/pages/ClientsPage.jsx
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
@@ -22,6 +21,9 @@ export default function ClientsPage() {
     currency: "",
     amountUah: "",
   });
+    
+   // --- опції для Select стека ---
+  const [stackOptions, setStackOptions] = useState([]);
 
   // --- завантаження клієнтів з бекенду ---
   async function fetchClients() {
@@ -48,6 +50,26 @@ export default function ClientsPage() {
   useEffect(() => {
     fetchClients();
   }, [page, filters]);
+    
+    
+    // --- завантаження унікальних стеків для фільтра ---
+    useEffect(() => {
+        const fetchStacks = async () => {
+            try {
+                const res = await api.get("/stacks");
+                const data = res.data.rows || res.data || [];
+                setStackOptions(
+                    data.map((s) => ({
+                        value: s.id,
+                        label: s.name,
+                    }))
+                );
+            } catch (err) {
+                console.error("Помилка завантаження стеків:", err);
+            }
+        };
+        fetchStacks();
+    }, []);
 
   // --- обробник зміни фільтра ---
   const handleFilterChange = (key, value) => {
