@@ -71,15 +71,16 @@ export default function ClientsPage() {
         <thead>
           <tr>
             <th>
-              Стек
-              <Select
-                options={[...new Set(rows.map((r) => r.stack))].map((s) => ({
-                  value: s,
-                  label: s,
-                }))}
-                onChange={(opt) => handleFilterChange("stack", opt?.value)}
-                isClearable
-              />
+                Стек
+                <Select
+                    options={stackOptions}
+                    value={filters.stack ? { value: filters.stack, label: filters.stack } : null}
+                    onChange={(selected) =>
+                    setFilters({ ...filters, stack: selected ? selected.value : "" })
+                    }
+                    isClearable
+                    placeholder="Пошук..."
+                />
             </th>
             <th>
               Назва
@@ -145,7 +146,7 @@ export default function ClientsPage() {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              <td>{row.stack || "-"}</td>
+              <td>{row.stacks && row.stacks.length > 0 ? row.stacks.map((s) => s.name).join(", ") : "-"}</td>
               <td>{row.name}</td>
               <td>{row.edrpou}</td>
               <td>{row.dealTitle || "-"}</td>
