@@ -122,12 +122,15 @@ export default function ClientsPage() {
               />
             </th>
             <th>
-              Валюта
-              <input
-                placeholder="Пошук..."
-                value={filters.currency}
-                onChange={(e) => handleFilterChange("currency", e.target.value)}
-              />
+                Валюта
+                <Select
+                    options={[...new Set(rows.map((r) => r.currency))].map((c) => ({
+                    value: c,
+                    label: c,
+                    }))}
+                    onChange={(opt) => handleFilterChange("currency", opt?.value)}
+                    isClearable
+                />
             </th>
             <th>
               Еквівалент в UAH
