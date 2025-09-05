@@ -42,6 +42,7 @@ export default function ClientsPage() {
       // угоди зі стеків
       if (client.stacks) {
         client.stacks.forEach((stack) => {
+          console.log("  Stack:", stack.name, "Deals:", stack.deals);
           if (stack.deals) {
             stack.deals
               .filter((d) => d.status === "active" && !d.client_id)
