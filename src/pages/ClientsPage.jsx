@@ -93,7 +93,7 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
         
-      setRows(normalized);
+      setRows(applyAmountFilter(normalized, filters));
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
