@@ -48,7 +48,7 @@ export default function ClientsPage() {
               .filter((d) => d.status === "active" && !d.client_id)
               .forEach((deal) => {
                 // показуємо тільки у першого клієнта стеку
-                if (clientIndex === 0) {
+                if (stack.clients[0].id === client.id) {
                   displayDeals.push(deal);
                 }
               });
