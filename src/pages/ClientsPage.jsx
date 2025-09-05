@@ -92,7 +92,8 @@ export default function ClientsPage() {
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
-      setRows(applyAmountFilter(normalized, filters));
+        
+      setRows(normalized);
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
@@ -135,7 +136,10 @@ export default function ClientsPage() {
   };
 
   // --- кількість сторінок ---
-  const totalPages = Math.ceil(count / PAGE_SIZE);
+    const totalPages = Math.ceil(count / PAGE_SIZE);
+    
+    // --- застосування фільтра по сумі в UAH ---
+    const filteredRows = applyAmountFilter(rows, filters);
 
   return (
     <div>
