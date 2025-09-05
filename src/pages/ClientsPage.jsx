@@ -27,7 +27,7 @@ export default function ClientsPage() {
 
   // --- нормалізація угод ---
   function normalizeClients(clients) {
-    return clients.map((client, clientIndex) => {
+    return clients.map((client) => {
       console.log("Client:", client.name, "Deals:", client.deals);
         
       const displayDeals = [];
@@ -61,46 +61,15 @@ export default function ClientsPage() {
   }
     
   // --- фільтрація на фронті ---
-  function applyFilters(clients, filters) {
-    return clients.map(client => {
-      let displayDeals = [...client.displayDeals];
+  function applyAmountFilter(clients, filters) {
+      if (!filters.amountUah) return clients; 
 
-    // фільтр по назві угоди
-      if (filters.dealTitle) {
-        displayDeals = displayDeals.filter(d =>
-          d.title?.toLowerCase().includes(filters.dealTitle.toLowerCase())
-      );
-    }
-
-    // фільтр по даті початку
-      if (filters.startDate) {
-        displayDeals = displayDeals.filter(d =>
-          d.start_date?.startsWith(filters.startDate)
-      );
-    }
-
-    // фільтр по сумі
-      if (filters.amount) {
-        displayDeals = displayDeals.filter(d =>
-          String(d.amount).includes(filters.amount)
-      );
-    }
-
-    // фільтр по валюті
-      if (filters.currency) {
-        displayDeals = displayDeals.filter(d =>
-          d.currency === filters.currency
-      );
-    }
-
-    // фільтр по еквіваленту (заглушка 1:1)
-      if (filters.amountUah) {
-        displayDeals = displayDeals.filter(d =>
-          String(d.amount).includes(filters.amountUah)
-      );
-    }
-
-    return { ...client, displayDeals };
+      return clients.map((client) => {
+        const displayDeals = client.displayDeals.filter((d) => {
+          const amountUah = d.amount;
+          return String(amountUah).includes(filters.amountUah);
+        });
+        return { ...client, displayDeals };
   });
   }
 
@@ -108,12 +77,14 @@ export default function ClientsPage() {
   async function fetchClients() {
     try {
       setLoading(true);
-
+        
+      const {amountUah, ...backendFilters} = filters;
+      
       const res = await api.get("/clients", {
         params: {
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
-          ...filters,
+          ...backendFilters,
         },
       });
         
@@ -121,7 +92,7 @@ export default function ClientsPage() {
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
-      setRows(applyFilters(normalized, filters));
+      setRows(applyAmountFilter(normalized, filters));
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
@@ -293,7 +264,10 @@ export default function ClientsPage() {
                   ? row.displayDeals.map((d) => d.currency).join(", ")
                   : "-"}
               </td>
-              <td>{row.amountUah || "-"}</td>
+              <td>{row.displayDeals.length > 0
+                  ? row.displayDeals.map((d) => d.amount /* курс = 1:1 */).join(", ")
+                  : "-"}
+              </td>
             </tr>
           ))}
         </tbody>
