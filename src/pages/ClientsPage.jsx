@@ -239,7 +239,7 @@ export default function ClientsPage() {
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => (
+          {filteredRows.map((row, i) => (
             <tr key={i}>
               <td>
                 {row.stacks && row.stacks.length > 0
