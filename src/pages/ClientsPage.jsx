@@ -21,9 +21,45 @@ export default function ClientsPage() {
     currency: "",
     amountUah: "",
   });
-    
-   // --- опції для Select стека ---
+
+  // --- опції для стеків ---
   const [stackOptions, setStackOptions] = useState([]);
+
+  // --- нормалізація угод ---
+  function normalizeClients(clients) {
+    return clients.map((client) => {
+      const displayDeals = [];
+
+      // угоди, які напряму належать клієнту
+      if (client.deals) {
+        displayDeals.push(
+          ...client.deals.filter((d) => d.status === "active")
+        );
+      }
+
+      // угоди зі стеків
+      if (client.stacks) {
+        client.stacks.forEach((stack) => {
+          if (stack.deals) {
+            stack.deals
+              .filter((d) => d.status === "active" && !d.client_id)
+              .forEach((deal) => {
+                // показуємо тільки у першого клієнта стеку
+                if (
+                  stack.clients &&
+                  stack.clients.length > 0 &&
+                  stack.clients[0].id === client.id
+                ) {
+                  displayDeals.push(deal);
+                }
+              });
+          }
+        });
+      }
+
+      return { ...client, displayDeals };
+    });
+  }
 
   // --- завантаження клієнтів з бекенду ---
   async function fetchClients() {
@@ -38,7 +74,8 @@ export default function ClientsPage() {
         },
       });
 
-      setRows(res.data.rows || []);
+      const rawClients = res.data.rows || [];
+      setRows(normalizeClients(rawClients));
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
@@ -50,30 +87,30 @@ export default function ClientsPage() {
   useEffect(() => {
     fetchClients();
   }, [page, filters]);
-    
-    
-    // --- завантаження унікальних стеків для фільтра ---
-    useEffect(() => {
-        const fetchStacks = async () => {
-            try {
-                const res = await api.get("/stacks");
-                const data = res.data.rows || res.data || [];
-                setStackOptions(
-                    data.map((s) => ({
-                        value: s.id,
-                        label: s.name,
-                    }))
-                );
-            } catch (err) {
-                console.error("Помилка завантаження стеків:", err);
-            }
-        };
-        fetchStacks();
-    }, []);
+
+  // --- завантаження стеків для фільтра ---
+  useEffect(() => {
+    const fetchStacks = async () => {
+      try {
+        const res = await api.get("/stacks");
+        const data = res.data.rows || res.data;
+        setStackOptions(
+          data.map((s) => ({
+            value: s.id,
+            label: s.name,
+          }))
+        );
+      } catch (err) {
+        console.error("Помилка завантаження стеків:", err);
+      }
+    };
+
+    fetchStacks();
+  }, []);
 
   // --- обробник зміни фільтра ---
   const handleFilterChange = (key, value) => {
-    setPage(1); // завжди починаємо з 1-ї сторінки
+    setPage(1);
     setFilters((prev) => ({
       ...prev,
       [key]: value || "",
@@ -93,16 +130,23 @@ export default function ClientsPage() {
         <thead>
           <tr>
             <th>
-                Стек
-                <Select
-                    options={stackOptions}
-                    value={filters.stack ? { value: filters.stack, label: filters.stack } : null}
-                    onChange={(selected) =>
-                    setFilters({ ...filters, stack: selected ? selected.value : "" })
-                    }
-                    isClearable
-                    placeholder="Пошук..."
-                />
+              Стек
+              <Select
+                options={stackOptions}
+                value={
+                  filters.stack
+                    ? stackOptions.find((o) => o.value === filters.stack)
+                    : null
+                }
+                onChange={(selected) =>
+                  setFilters({
+                    ...filters,
+                    stack: selected ? selected.value : "",
+                  })
+                }
+                isClearable
+                placeholder="Пошук..."
+              />
             </th>
             <th>
               Назва
@@ -121,11 +165,13 @@ export default function ClientsPage() {
               />
             </th>
             <th>
-              Назва угоди
+              Угоди (назви)
               <input
                 placeholder="Пошук..."
                 value={filters.dealTitle}
-                onChange={(e) => handleFilterChange("dealTitle", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("dealTitle", e.target.value)
+                }
               />
             </th>
             <th>
@@ -133,7 +179,9 @@ export default function ClientsPage() {
               <input
                 type="date"
                 value={filters.startDate}
-                onChange={(e) => handleFilterChange("startDate", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("startDate", e.target.value)
+                }
               />
             </th>
             <th>
@@ -145,22 +193,26 @@ export default function ClientsPage() {
               />
             </th>
             <th>
-                Валюта
-                <Select
-                    options={[...new Set(rows.map((r) => r.currency))].map((c) => ({
-                    value: c,
-                    label: c,
-                    }))}
-                    onChange={(opt) => handleFilterChange("currency", opt?.value)}
-                    isClearable
-                />
+              Валюта
+              <Select
+                options={[...new Set(rows.flatMap((r) =>
+                  r.displayDeals.map((d) => d.currency)
+                ))].map((c) => ({
+                  value: c,
+                  label: c,
+                }))}
+                onChange={(opt) => handleFilterChange("currency", opt?.value)}
+                isClearable
+              />
             </th>
             <th>
               Еквівалент в UAH
               <input
                 placeholder="Пошук..."
                 value={filters.amountUah}
-                onChange={(e) => handleFilterChange("amountUah", e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange("amountUah", e.target.value)
+                }
               />
             </th>
           </tr>
@@ -168,13 +220,33 @@ export default function ClientsPage() {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i}>
-              <td>{row.stacks && row.stacks.length > 0 ? row.stacks.map((s) => s.name).join(", ") : "-"}</td>
+              <td>
+                {row.stacks && row.stacks.length > 0
+                  ? row.stacks.map((s) => s.name).join(", ")
+                  : "-"}
+              </td>
               <td>{row.name}</td>
               <td>{row.edrpou}</td>
-              <td>{row.dealTitle || "-"}</td>
-              <td>{row.startDate || "-"}</td>
-              <td>{row.amount || "-"}</td>
-              <td>{row.currency || "-"}</td>
+              <td>
+                {row.displayDeals.length > 0
+                  ? row.displayDeals.map((d) => d.title).join(", ")
+                  : "-"}
+              </td>
+              <td>
+                {row.displayDeals.length > 0
+                  ? row.displayDeals.map((d) => d.start_date).join(", ")
+                  : "-"}
+              </td>
+              <td>
+                {row.displayDeals.length > 0
+                  ? row.displayDeals.map((d) => d.amount).join(", ")
+                  : "-"}
+              </td>
+              <td>
+                {row.displayDeals.length > 0
+                  ? row.displayDeals.map((d) => d.currency).join(", ")
+                  : "-"}
+              </td>
               <td>{row.amountUah || "-"}</td>
             </tr>
           ))}
@@ -189,7 +261,10 @@ export default function ClientsPage() {
         <span>
           {page} / {totalPages || 1}
         </span>
-        <button disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
+        <button
+          disabled={page >= totalPages}
+          onClick={() => setPage(page + 1)}
+        >
           Вперед
         </button>
       </div>
