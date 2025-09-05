@@ -75,6 +75,7 @@ export default function ClientsPage() {
       });
 
       const rawClients = res.data.rows || [];
+      console.log("rawClients ===>", res.data.rows || res.data);
       setRows(normalizeClients(rawClients));
       setCount(res.data.count || 0);
     } catch (err) {
