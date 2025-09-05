@@ -27,7 +27,7 @@ export default function ClientsPage() {
 
   // --- нормалізація угод ---
   function normalizeClients(clients) {
-    return clients.map((client) => {
+    return clients.map((client, clientIndex) => {
       console.log("Client:", client.name, "Deals:", client.deals);
         
       const displayDeals = [];
