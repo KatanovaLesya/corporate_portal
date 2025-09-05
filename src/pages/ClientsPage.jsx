@@ -28,6 +28,8 @@ export default function ClientsPage() {
   // --- нормалізація угод ---
   function normalizeClients(clients) {
     return clients.map((client) => {
+      console.log("Client:", client.name, "Deals:", client.deals);
+        
       const displayDeals = [];
 
       // угоди, які напряму належать клієнту
