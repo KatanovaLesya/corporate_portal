@@ -59,6 +59,50 @@ export default function ClientsPage() {
       return { ...client, displayDeals };
     });
   }
+    
+  // --- фільтрація на фронті ---
+  function applyFilters(clients, filters) {
+    return clients.map(client => {
+      let displayDeals = [...client.displayDeals];
+
+    // фільтр по назві угоди
+      if (filters.dealTitle) {
+        displayDeals = displayDeals.filter(d =>
+          d.title?.toLowerCase().includes(filters.dealTitle.toLowerCase())
+      );
+    }
+
+    // фільтр по даті початку
+      if (filters.startDate) {
+        displayDeals = displayDeals.filter(d =>
+          d.start_date?.startsWith(filters.startDate)
+      );
+    }
+
+    // фільтр по сумі
+      if (filters.amount) {
+        displayDeals = displayDeals.filter(d =>
+          String(d.amount).includes(filters.amount)
+      );
+    }
+
+    // фільтр по валюті
+      if (filters.currency) {
+        displayDeals = displayDeals.filter(d =>
+          d.currency === filters.currency
+      );
+    }
+
+    // фільтр по еквіваленту (заглушка 1:1)
+      if (filters.amountUah) {
+        displayDeals = displayDeals.filter(d =>
+          String(d.amount).includes(filters.amountUah)
+      );
+    }
+
+    return { ...client, displayDeals };
+  });
+  }
 
   // --- завантаження клієнтів з бекенду ---
   async function fetchClients() {
@@ -76,7 +120,8 @@ export default function ClientsPage() {
       console.log("rawClients ===>", res.data.rows || res.data);
 
       const rawClients = res.data.rows || [];
-      setRows(normalizeClients(rawClients));
+      const normalized = normalizeClients(rawClients);
+      setRows(applyFilters(normalized, filters));
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
