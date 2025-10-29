@@ -104,7 +104,7 @@ export default function ClientsPage() {
     setLoading(true);
     try {
       const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
-      const data = normalizeClients(res.data.clients || []);
+      const data = normalizeClients(res.data.clients || res.data.data || res.data || []);
       const filtered = applyFilters(data, filters);
 
       // формування валют
