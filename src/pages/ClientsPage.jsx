@@ -22,7 +22,6 @@ export default function ClientsPage() {
     amountUah: "",
   });
 
-  const [stackOptions, setStackOptions] = useState([]);
   const [currencyOptions, setCurrencyOptions] = useState([]);
   const debounceRef = useRef(null);
 
@@ -33,7 +32,7 @@ export default function ClientsPage() {
 
       // угоди, які напряму належать клієнту
       if (client.deals) {
-        displayDeals.push(...client.deals.filter((d) => d.status === "active"));
+        displayDeals.push(...client.deals); // без фільтрації за статусом
       }
 
       // угоди зі стеків
@@ -41,7 +40,7 @@ export default function ClientsPage() {
         client.stacks.forEach((stack) => {
           if (stack.deals) {
             stack.deals
-              .filter((d) => d.status === "active" && !d.client_id)
+              .filter((d) => !d.client_id) // без статусу
               .forEach((deal) => {
                 // показуємо тільки у першого клієнта стеку
                 if (stack.clients && stack.clients[0].id === client.id) {
@@ -58,6 +57,8 @@ export default function ClientsPage() {
 
   // --- фільтрація ---
   function applyFilters(clients, filters) {
+    if (!filters || Object.values(filters).every((v) => v === "")) return clients;
+
     return clients.filter((client) => {
       const matchStack =
         !filters.stack ||
@@ -98,12 +99,15 @@ export default function ClientsPage() {
     });
   }
 
-  // --- отримання клієнтів через API (твоя логіка збережена) ---
+  // --- отримання клієнтів через API ---
   async function fetchClients() {
     setLoading(true);
     try {
       const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
-      const data = normalizeClients(res.data || []);
+      const rawData = Array.isArray(res.data)
+        ? res.data
+        : res.data.clients || res.data.data || [];
+      const data = normalizeClients(rawData);
       const filtered = applyFilters(data, filters);
 
       // валютні опції
@@ -144,6 +148,7 @@ export default function ClientsPage() {
     <div className={styles.wrapper}>
       <h2>Клієнти</h2>
 
+      {/* --- Фільтри --- */}
       <div className={styles.filters}>
         <input placeholder="Стек" onChange={(e) => handleFilterChange("stack", e.target.value)} />
         <input placeholder="Назва" onChange={(e) => handleFilterChange("name", e.target.value)} />
@@ -160,6 +165,7 @@ export default function ClientsPage() {
         <input placeholder="Еквівалент в UAH" onChange={(e) => handleFilterChange("amountUah", e.target.value)} />
       </div>
 
+      {/* --- Таблиця --- */}
       {loading ? (
         <p>Завантаження...</p>
       ) : (
@@ -208,6 +214,7 @@ export default function ClientsPage() {
         </table>
       )}
 
+      {/* --- Пагінація --- */}
       <div className={styles.pagination}>
         <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
           ⬅ Попередня
