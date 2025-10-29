@@ -96,31 +96,18 @@ export default function ClientsPage() {
       // 🔍 Фільтр по угоді (назві)
       console.log("🔍 DEBUG CLIENTS ===>", normalized.slice(0, 3));
 
+      // 🔍 Фільтр по угоді (працює через displayDeals)
       const filteredByDealTitle = dealTitle
-        ? normalized.filter((client) => {
-            const query = dealTitle.toLowerCase();
-
-            // Безпечна перевірка: є угода напряму у клієнта
-            const clientDeals =
-              client?.deals?.some(
-                (deal) =>
-                  typeof deal?.title === "string" &&
-                  deal.title.toLowerCase().includes(query)
-              ) || false;
-
-            // Є угода у будь-якому зі стеків клієнта
-            const stackDeals =
-              client?.stacks?.some((stack) =>
-                stack?.deals?.some(
-                  (deal) =>
-                    typeof deal?.title === "string" &&
-                    deal.title.toLowerCase().includes(query)
-                )
-              ) || false;
-
-            return clientDeals || stackDeals;
-          })
+        ? normalized.filter((client) =>
+            Array.isArray(client.displayDeals) &&
+            client.displayDeals.some(
+              (deal) =>
+                typeof deal.title === "string" &&
+                deal.title.toLowerCase().includes(dealTitle.toLowerCase())
+            )
+          )
         : normalized;
+
   console.log("✅ Found deals filter:", filteredByDealTitle.map(c => c.name));
 
 
