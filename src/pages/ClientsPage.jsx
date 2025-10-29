@@ -121,6 +121,7 @@ export default function ClientsPage() {
             return clientDeals || stackDeals;
           })
         : normalized;
+  console.log("✅ Found deals filter:", filteredByDealTitle.map(c => c.name));
 
 
 
