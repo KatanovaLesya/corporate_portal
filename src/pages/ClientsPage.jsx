@@ -78,7 +78,7 @@ export default function ClientsPage() {
     try {
       setLoading(true);
         
-      const {amountUah, ...backendFilters} = filters;
+      const {amountUah, dealTitle, ...backendFilters} = filters;
       
       const res = await api.get("/clients", {
         params: {
@@ -92,6 +92,16 @@ export default function ClientsPage() {
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
+
+      // 🔍 новий блок: фільтр по назві угоди
+      const filteredByDealTitle = dealTitle
+        ? normalized.filter((client) =>
+            client.displayDeals.some((d) =>
+              d.title?.toLowerCase().includes(dealTitle.toLowerCase())
+            )
+          )
+        : normalized;
+
         
       setRows(applyAmountFilter(normalized, filters));
       setCount(res.data.count || 0);
