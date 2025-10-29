@@ -6,11 +6,11 @@ import styles from "./ClientsPage.module.css";
 const PAGE_SIZE = 50;
 
 export default function ClientsPage() {
-  const [rows, setRows] = useState([]);
-  const [count, setCount] = useState(0);
+  const [clients, setClients] = useState([]);
+  const [stacks, setStacks] = useState([]);
   const [page, setPage] = useState(1);
+  const [count, setCount] = useState(0);
   const [loading, setLoading] = useState(false);
-
   const [filters, setFilters] = useState({
     stack: "",
     name: "",
@@ -21,105 +21,15 @@ export default function ClientsPage() {
     currency: "",
     amountUah: "",
   });
-
-  const [stackOptions, setStackOptions] = useState([]);
-  const [currencyOptions, setCurrencyOptions] = useState([]);
   const debounceRef = useRef(null);
 
-  // --- нормалізація клієнтів та їхніх угод ---
-  const normalizeClients = (clients) => {
-    return clients.map((client) => {
-      const displayDeals = [];
-
-      if (client.deals) {
-        displayDeals.push(...client.deals.filter((d) => d.status === "active"));
-      }
-
-      if (client.stacks) {
-        client.stacks.forEach((stack) => {
-          if (stack.deals) {
-            stack.deals
-              .filter((d) => d.status === "active" && !d.client_id)
-              .forEach((deal) => {
-                if (stack.clients && stack.clients[0].id === client.id) {
-                  displayDeals.push(deal);
-                }
-              });
-          }
-        });
-      }
-
-      return { ...client, displayDeals };
-    });
-  };
-
-  // --- фільтрація ---
-  const applyFilters = (clients, filters) => {
-    if (!filters || Object.values(filters).every((v) => v === "")) return clients;
-
-    return clients.filter((client) => {
-      const matchStack =
-        !filters.stack ||
-        client.stacks?.some((s) =>
-          s.name?.toLowerCase().includes(filters.stack.toLowerCase())
-        );
-
-      const matchName =
-        !filters.name ||
-        client.name?.toLowerCase().includes(filters.name.toLowerCase());
-
-      const matchEdrpou =
-        !filters.edrpou ||
-        client.edrpou?.toLowerCase().includes(filters.edrpou.toLowerCase());
-
-      const matchDeals = client.displayDeals.some((deal) => {
-        const matchDealTitle =
-          !filters.dealTitle ||
-          deal.title?.toLowerCase().includes(filters.dealTitle.toLowerCase());
-        const matchStartDate =
-          !filters.startDate || deal.start_date?.includes(filters.startDate);
-        const matchAmount =
-          !filters.amount || String(deal.amount).includes(filters.amount);
-        const matchCurrency =
-          !filters.currency || deal.currency === filters.currency;
-        const matchAmountUah =
-          !filters.amountUah ||
-          String(deal.amountUah)?.includes(filters.amountUah);
-
-        return (
-          matchDealTitle &&
-          matchStartDate &&
-          matchAmount &&
-          matchCurrency &&
-          matchAmountUah
-        );
-      });
-
-      return matchStack && matchName && matchEdrpou && matchDeals;
-    });
-  };
-
-  // --- отримання клієнтів ---
+  // --- отримання клієнтів (як було) ---
   const fetchClients = async () => {
     setLoading(true);
     try {
-      const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
-      const rawData = Array.isArray(res.data)
-        ? res.data
-        : res.data.rows || res.data.clients || res.data.data || [];
-
-      const data = normalizeClients(rawData);
-      const filtered = applyFilters(data, filters);
-
-      setRows(filtered);
-      setCount(res.data.count || filtered.length);
-
-      // валютні опції
-      const allCurrencies = new Set();
-      data.forEach((c) =>
-        c.displayDeals?.forEach((d) => d.currency && allCurrencies.add(d.currency))
-      );
-      setCurrencyOptions([...allCurrencies].map((c) => ({ value: c, label: c })));
+      const response = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
+      setClients(response.data.rows);
+      setCount(response.data.count);
     } catch (error) {
       console.error("Помилка при отриманні клієнтів:", error);
     } finally {
@@ -127,16 +37,11 @@ export default function ClientsPage() {
     }
   };
 
-  // --- отримання стеків ---
+  // --- отримання стеків (як було) ---
   const fetchStacks = async () => {
     try {
-      const res = await api.get("/stacks");
-      setStackOptions(
-        res.data.map((stack) => ({
-          value: stack.name,
-          label: stack.name,
-        }))
-      );
+      const response = await api.get("/stacks");
+      setStacks(response.data);
     } catch (error) {
       console.error("Помилка при отриманні стеків:", error);
     }
@@ -151,18 +56,74 @@ export default function ClientsPage() {
     return () => clearTimeout(debounceRef.current);
   }, [filters, page]);
 
-  // --- reset сторінки при зміні фільтрів ---
-  useEffect(() => {
-    setPage(1);
-  }, [filters]);
-
   useEffect(() => {
     fetchStacks();
+    fetchClients();
   }, []);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
+    setPage(1);
   };
+
+  // --- стабільна локальна фільтрація ---
+  const filteredClients = clients.filter((client) => {
+    const stackMatch =
+      !filters.stack ||
+      client.stacks?.some((s) =>
+        s.name?.toLowerCase().includes(filters.stack.toLowerCase())
+      );
+
+    const nameMatch =
+      !filters.name ||
+      client.name?.toLowerCase().includes(filters.name.toLowerCase());
+
+    const edrpouMatch =
+      !filters.edrpou ||
+      client.edrpou?.toLowerCase().includes(filters.edrpou.toLowerCase());
+
+    const dealMatch =
+      !filters.dealTitle &&
+      !filters.startDate &&
+      !filters.amount &&
+      !filters.currency &&
+      !filters.amountUah
+        ? true
+        : client.deals?.some((deal) => {
+            const dealTitleMatch =
+              !filters.dealTitle ||
+              deal.title
+                ?.toLowerCase()
+                .includes(filters.dealTitle.toLowerCase());
+            const startDateMatch =
+              !filters.startDate ||
+              (deal.start_date &&
+                deal.start_date.includes(filters.startDate));
+            const amountMatch =
+              !filters.amount ||
+              String(deal.amount)
+                ?.toLowerCase()
+                .includes(filters.amount.toLowerCase());
+            const currencyMatch =
+              !filters.currency ||
+              deal.currency?.toLowerCase() === filters.currency.toLowerCase();
+            const amountUahMatch =
+              !filters.amountUah ||
+              String(deal.amountUah)
+                ?.toLowerCase()
+                .includes(filters.amountUah.toLowerCase());
+
+            return (
+              dealTitleMatch &&
+              startDateMatch &&
+              amountMatch &&
+              currencyMatch &&
+              amountUahMatch
+            );
+          });
+
+    return stackMatch && nameMatch && edrpouMatch && dealMatch;
+  });
 
   return (
     <div className={styles.wrapper}>
@@ -171,26 +132,46 @@ export default function ClientsPage() {
       {/* --- Фільтри --- */}
       <div className={styles.filters}>
         <Select
-          options={stackOptions}
+          options={stacks.map((stack) => ({
+            value: stack.name,
+            label: stack.name,
+          }))}
           placeholder="Стек"
           isClearable
-          onChange={(selected) => handleFilterChange("stack", selected?.value || "")}
+          onChange={(selected) =>
+            handleFilterChange("stack", selected?.value || "")
+          }
         />
-        <input placeholder="Назва" onChange={(e) => handleFilterChange("name", e.target.value)} />
-        <input placeholder="ЄДРПОУ" onChange={(e) => handleFilterChange("edrpou", e.target.value)} />
-        <input placeholder="Угода (назва)" onChange={(e) => handleFilterChange("dealTitle", e.target.value)} />
-        <input type="date" onChange={(e) => handleFilterChange("startDate", e.target.value)} />
-        <input placeholder="Сума" onChange={(e) => handleFilterChange("amount", e.target.value)} />
-        <Select
-          options={currencyOptions}
+        <input
+          placeholder="Назва"
+          onChange={(e) => handleFilterChange("name", e.target.value)}
+        />
+        <input
+          placeholder="ЄДРПОУ"
+          onChange={(e) => handleFilterChange("edrpou", e.target.value)}
+        />
+        <input
+          placeholder="Угода (назва)"
+          onChange={(e) => handleFilterChange("dealTitle", e.target.value)}
+        />
+        <input
+          type="date"
+          onChange={(e) => handleFilterChange("startDate", e.target.value)}
+        />
+        <input
+          placeholder="Сума"
+          onChange={(e) => handleFilterChange("amount", e.target.value)}
+        />
+        <input
           placeholder="Валюта"
-          isClearable
-          onChange={(selected) => handleFilterChange("currency", selected?.value || "")}
+          onChange={(e) => handleFilterChange("currency", e.target.value)}
         />
-        <input placeholder="Еквівалент в UAH" onChange={(e) => handleFilterChange("amountUah", e.target.value)} />
+        <input
+          placeholder="Еквівалент в UAH"
+          onChange={(e) => handleFilterChange("amountUah", e.target.value)}
+        />
       </div>
 
-      {/* --- Таблиця --- */}
       {loading ? (
         <p>Завантаження...</p>
       ) : (
@@ -201,49 +182,47 @@ export default function ClientsPage() {
               <th>Назва</th>
               <th>ЄДРПОУ</th>
               <th>Угоди</th>
-              <th>Дата</th>
+              <th>Дата угоди</th>
               <th>Сума</th>
               <th>Валюта</th>
               <th>Еквівалент (UAH)</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((client) => (
-              <tr key={client.id} className={styles.row}>
+            {filteredClients.map((client) => (
+              <tr key={client.id}>
                 <td>{client.stacks?.map((s) => s.name).join(", ") || "-"}</td>
                 <td>{client.name}</td>
                 <td>{client.edrpou}</td>
+                <td>{client.deals?.map((d) => d.title).join(", ") || "-"}</td>
                 <td>
-                  {client.displayDeals?.length ? (
-                    client.displayDeals.map((d, i) => (
-                      <div key={i} className={styles.deal}>
-                        {d.title || "-"}
-                      </div>
-                    ))
-                  ) : (
-                    "-"
-                  )}
+                  {client.deals?.map((d) => d.start_date).join(", ") || "-"}
                 </td>
-                <td>{client.displayDeals?.map((d) => d.start_date).join(", ") || "-"}</td>
-                <td>{client.displayDeals?.map((d) => d.amount).join(", ") || "-"}</td>
-                <td>{client.displayDeals?.map((d) => d.currency).join(", ") || "-"}</td>
-                <td>{client.displayDeals?.map((d) => d.amountUah).join(", ") || "-"}</td>
+                <td>{client.deals?.map((d) => d.amount).join(", ") || "-"}</td>
+                <td>{client.deals?.map((d) => d.currency).join(", ") || "-"}</td>
+                <td>
+                  {client.deals?.map((d) => d.amountUah).join(", ") || "-"}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       )}
 
-      {/* --- Пагінація --- */}
       <div className={styles.pagination}>
-        <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
+        <button
+          onClick={() => setPage((p) => Math.max(p - 1, 1))}
+          disabled={page === 1}
+        >
           ⬅ Попередня
         </button>
         <span>
           Сторінка {page} з {Math.ceil(count / PAGE_SIZE) || 1}
         </span>
         <button
-          onClick={() => setPage((p) => (p * PAGE_SIZE < count ? p + 1 : p))}
+          onClick={() =>
+            setPage((p) => (p * PAGE_SIZE < count ? p + 1 : p))
+          }
           disabled={page * PAGE_SIZE >= count}
         >
           Наступна ➡
