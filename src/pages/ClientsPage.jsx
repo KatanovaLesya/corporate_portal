@@ -93,14 +93,16 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      // 🔍 новий блок: фільтр по назві угоди
+      // 🔍 фільтр по назві угоди (працює навіть якщо deals є тільки на деяких клієнтах)
       const filteredByDealTitle = dealTitle
         ? normalized.filter((client) =>
-            client.displayDeals.some((d) =>
-              d.title?.toLowerCase().includes(dealTitle.toLowerCase())
+            Array.isArray(client.deals) &&
+            client.deals.some((deal) =>
+              deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
             )
           )
         : normalized;
+
 
         
       setRows(applyAmountFilter(normalized, filters));
