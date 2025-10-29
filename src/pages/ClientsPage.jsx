@@ -96,13 +96,13 @@ export default function ClientsPage() {
       // 🔍 Фільтр по угоді (назві)
       console.log("🔍 DEBUG CLIENTS ===>", normalized.slice(0, 3));
 
+      // 🔍 Фільтр по угоді (назві)
       const filteredByDealTitle = dealTitle
         ? normalized.filter((client) => {
-            // приводимо запит до нижнього регістру
             const query = dealTitle.toLowerCase();
 
-            // 1️⃣ якщо угоди є напряму в клієнта (майже завжди порожньо)
-            const hasDirectDeal =
+            // 1️⃣ Перевіряємо угоди безпосередньо у клієнта (на випадок, якщо будуть)
+            const hasClientDeal =
               Array.isArray(client.deals) &&
               client.deals.some(
                 (deal) =>
@@ -110,7 +110,7 @@ export default function ClientsPage() {
                   deal.title.toLowerCase().includes(query)
               );
 
-            // 2️⃣ якщо угоди є у стеків клієнта
+            // 2️⃣ Перевіряємо угоди у всіх стеках клієнта
             const hasStackDeal =
               Array.isArray(client.stacks) &&
               client.stacks.some(
@@ -123,16 +123,12 @@ export default function ClientsPage() {
                   )
               );
 
-            // 3️⃣ показуємо клієнта, якщо він має угоду напряму або через стек
-            return hasDirectDeal || hasStackDeal;
+            // 3️⃣ Показуємо клієнта, якщо він має угоду напряму або через стек
+            return hasClientDeal || hasStackDeal;
           })
         : normalized;
 
 
-
-
-
-        
       setRows(applyAmountFilter(normalized, filters));
       setCount(res.data.count || 0);
     } catch (err) {
