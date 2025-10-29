@@ -94,6 +94,8 @@ export default function ClientsPage() {
       const normalized = normalizeClients(rawClients);
 
       // 🔍 Фільтр по угоді (назві)
+      console.log("🔍 DEBUG CLIENTS ===>", normalized.slice(0, 3));
+
       const filteredByDealTitle = dealTitle
         ? normalized.filter((client) => {
             // приводимо запит до нижнього регістру
