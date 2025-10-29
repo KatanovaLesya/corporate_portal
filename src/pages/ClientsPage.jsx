@@ -93,41 +93,39 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-            // 🔍 Фільтр по угоді (для твоєї реальної структури)
+      // 🔍 Фільтр по угоді (назві)
       const filteredByDealTitle = dealTitle
         ? normalized.filter((client) => {
-            let hasMatch = false;
+            // приводимо запит до нижнього регістру
+            const query = dealTitle.toLowerCase();
 
-            // 1️⃣ Перевірка угод клієнта напряму
-            if (Array.isArray(client.deals) && client.deals.length > 0) {
-              hasMatch = client.deals.some(
+            // 1️⃣ якщо угоди є напряму в клієнта (майже завжди порожньо)
+            const hasDirectDeal =
+              Array.isArray(client.deals) &&
+              client.deals.some(
                 (deal) =>
                   typeof deal.title === "string" &&
-                  deal.title.toLowerCase().includes(dealTitle.toLowerCase())
+                  deal.title.toLowerCase().includes(query)
               );
-            }
 
-            // 2️⃣ Якщо не знайшли — перевіряємо угоди у стеку
-            if (!hasMatch && Array.isArray(client.stacks)) {
-              for (const stack of client.stacks) {
-                if (Array.isArray(stack.deals) && stack.deals.length > 0) {
-                  const foundDeal = stack.deals.some(
+            // 2️⃣ якщо угоди є у стеків клієнта
+            const hasStackDeal =
+              Array.isArray(client.stacks) &&
+              client.stacks.some(
+                (stack) =>
+                  Array.isArray(stack.deals) &&
+                  stack.deals.some(
                     (deal) =>
                       typeof deal.title === "string" &&
-                      deal.title.toLowerCase().includes(dealTitle.toLowerCase())
-                  );
+                      deal.title.toLowerCase().includes(query)
+                  )
+              );
 
-                  if (foundDeal) {
-                    hasMatch = true;
-                    break;
-                  }
-                }
-              }
-            }
-
-            return hasMatch;
+            // 3️⃣ показуємо клієнта, якщо він має угоду напряму або через стек
+            return hasDirectDeal || hasStackDeal;
           })
         : normalized;
+
 
 
 
