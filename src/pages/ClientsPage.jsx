@@ -94,7 +94,30 @@ export default function ClientsPage() {
       const normalized = normalizeClients(rawClients);
 
       // 🔍 Фільтр по угоді (назві)
-      console.log("🔍 DEBUG CLIENTS ===>", normalized.slice(0, 3));
+      if (dealTitle) {
+        console.log("🔍 DEBUG DEAL FILTER ===>");
+        normalized.forEach((client) => {
+          const clientDeals = Array.isArray(client.deals) ? client.deals : [];
+          const stackDeals = Array.isArray(client.stacks)
+            ? client.stacks.flatMap((s) => (Array.isArray(s.deals) ? s.deals : []))
+            : [];
+
+          const allDeals = [...clientDeals, ...stackDeals];
+
+          const matched = allDeals.filter(
+            (d) =>
+              d.title &&
+              d.title.toLowerCase().includes(dealTitle.toLowerCase())
+          );
+
+          if (matched.length > 0) {
+            console.log("✅ MATCH:", client.name, "->", matched.map((m) => m.title));
+          } else {
+            console.log("❌ NO MATCH:", client.name);
+          }
+        });
+      }
+
 
       // 🔍 Фільтр по угоді (працює через displayDeals)
       const filteredByDealTitle = dealTitle
