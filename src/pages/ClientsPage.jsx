@@ -96,37 +96,32 @@ export default function ClientsPage() {
       // 🔍 Фільтр по угоді (назві)
       console.log("🔍 DEBUG CLIENTS ===>", normalized.slice(0, 3));
 
-      // 🔍 Фільтр по угоді (назві)
       const filteredByDealTitle = dealTitle
         ? normalized.filter((client) => {
             const query = dealTitle.toLowerCase();
 
-            // 1️⃣ Перевіряємо угоди безпосередньо у клієнта (на випадок, якщо будуть)
-            const hasClientDeal =
-              Array.isArray(client.deals) &&
-              client.deals.some(
+            // Безпечна перевірка: є угода напряму у клієнта
+            const clientDeals =
+              client?.deals?.some(
                 (deal) =>
-                  typeof deal.title === "string" &&
+                  typeof deal?.title === "string" &&
                   deal.title.toLowerCase().includes(query)
-              );
+              ) || false;
 
-            // 2️⃣ Перевіряємо угоди у всіх стеках клієнта
-            const hasStackDeal =
-              Array.isArray(client.stacks) &&
-              client.stacks.some(
-                (stack) =>
-                  Array.isArray(stack.deals) &&
-                  stack.deals.some(
-                    (deal) =>
-                      typeof deal.title === "string" &&
-                      deal.title.toLowerCase().includes(query)
-                  )
-              );
+            // Є угода у будь-якому зі стеків клієнта
+            const stackDeals =
+              client?.stacks?.some((stack) =>
+                stack?.deals?.some(
+                  (deal) =>
+                    typeof deal?.title === "string" &&
+                    deal.title.toLowerCase().includes(query)
+                )
+              ) || false;
 
-            // 3️⃣ Показуємо клієнта, якщо він має угоду напряму або через стек
-            return hasClientDeal || hasStackDeal;
+            return clientDeals || stackDeals;
           })
         : normalized;
+
 
 
       setRows(applyAmountFilter(normalized, filters));
