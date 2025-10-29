@@ -105,27 +105,33 @@ export default function ClientsPage() {
     try {
       const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
       console.log("🔍 API response:", res.data);
+
       const rawData = Array.isArray(res.data)
         ? res.data
-        : res.data.clients || res.data.data || [];
+        : res.data.rows || res.data.clients || res.data.data || [];
+
       const data = normalizeClients(rawData);
       console.log("✅ Normalized clients:", data);
+
       const filtered = applyFilters(data, filters);
 
-      // валютні опції
+  // --- валютні опції ---
       const allCurrencies = new Set();
       data.forEach((c) =>
         c.displayDeals?.forEach((d) => d.currency && allCurrencies.add(d.currency))
       );
       setCurrencyOptions([...allCurrencies].map((c) => ({ value: c, label: c })));
 
+  // 🟣 Ось тут цей рядок 👇
+      setCount(res.data.count || rawData.length);
+
       setRows(filtered);
-      setCount(filtered.length);
     } catch (error) {
       console.error("Помилка при отриманні клієнтів:", error);
     } finally {
       setLoading(false);
     }
+
   }
 
   // --- debounce фільтрів ---
