@@ -41,7 +41,7 @@ export default function ClientsPage() {
   const fetchStacks = async () => {
     try {
       const response = await api.get("/stacks");
-      setStacks(response.data);
+      setStacks(response.data.rows);
     } catch (error) {
       console.error("Помилка при отриманні стеків:", error);
     }
