@@ -98,15 +98,30 @@ export default function ClientsPage() {
 
       // 🔍 Фільтр по угоді (працює через displayDeals)
       const filteredByDealTitle = dealTitle
-        ? normalized.filter((client) =>
-            Array.isArray(client.displayDeals) &&
-            client.displayDeals.some(
-              (deal) =>
-                typeof deal.title === "string" &&
-                deal.title.toLowerCase().includes(dealTitle.toLowerCase())
-            )
-          )
-        : normalized;
+        ? normalized.filter((client) => {
+          // 1️⃣ Угоди, що напряму в клієнта
+          const clientDeals = Array.isArray(client.deals)
+            ? client.deals
+            : [];
+
+          // 2️⃣ Угоди зі стеків, до яких належить клієнт
+          const stackDeals = Array.isArray(client.stacks)
+            ? client.stacks.flatMap((s) =>
+                Array.isArray(s.deals) ? s.deals : []
+              )
+            : [];
+
+          // 3️⃣ Об’єднуємо все в один список для перевірки
+          const allDeals = [...clientDeals, ...stackDeals];
+
+          // 4️⃣ Фільтр по назві угоди
+          return allDeals.some(
+            (deal) =>
+              deal.title &&
+              deal.title.toLowerCase().includes(dealTitle.toLowerCase())
+          );
+    })
+  : normalized;
 
   console.log("✅ Found deals filter:", filteredByDealTitle.map(c => c.name));
 
