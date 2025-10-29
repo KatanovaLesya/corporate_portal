@@ -1,0 +1,72 @@
+.deal-tag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin: 1px 4px;
+}
+
+.direct-deal {
+    background-color: #e3f2fd;
+    /* світло-синій */
+    color: #0d47a1;
+}
+
+.stack-deal {
+    background-color: #f3e5f5;
+    /* світло-фіолетовий */
+    color: #6a1b9a;
+}
+
+.wrapper {
+    padding: 1.5rem;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th,
+.table td {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 8px;
+    text-align: left;
+}
+
+.row:hover {
+    background-color: #f9f9ff;
+}
+
+.dealTag {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    margin: 1px 4px;
+}
+
+.directDeal {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+}
+
+.stackDeal {
+    background-color: #f3e5f5;
+    color: #6a1b9a;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1rem;
+    gap: 12px;
+}
