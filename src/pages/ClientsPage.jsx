@@ -150,7 +150,14 @@ export default function ClientsPage() {
 
 
 
-      setRows(applyAmountFilter(normalized, filters));
+            // 🔹 Якщо користувач шукає по угоді — використовуємо filteredByDealTitle
+      // 🔹 Якщо ні — залишаємо normalized
+      const filteredData = dealTitle ? filteredByDealTitle : normalized;
+
+      // 🔹 Далі застосовуємо фільтр по сумі (як у тебе було)
+      setRows(applyAmountFilter(filteredData, filters));
+
+
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
