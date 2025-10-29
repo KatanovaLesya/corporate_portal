@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
@@ -10,7 +10,6 @@ export default function ClientsPage() {
   const [stacks, setStacks] = useState([]);
   const [page, setPage] = useState(1);
   const [count, setCount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({
     stack: "",
     name: "",
@@ -21,57 +20,47 @@ export default function ClientsPage() {
     currency: "",
     amountUah: "",
   });
-  const debounceRef = useRef(null);
 
-  // --- отримання клієнтів (як було) ---
+  // --- отримання клієнтів (як у тебе було) ---
   const fetchClients = async () => {
-    setLoading(true);
     try {
       const response = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
       setClients(response.data.rows);
       setCount(response.data.count);
     } catch (error) {
       console.error("Помилка при отриманні клієнтів:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
-  // --- отримання стеків (як було) ---
+  // --- отримання стеків (з урахуванням бекенду) ---
   const fetchStacks = async () => {
     try {
       const response = await api.get("/stacks");
-      setStacks(response.data.rows);
+      setStacks(response.data.rows || response.data); // бек повертає {count, rows}
     } catch (error) {
       console.error("Помилка при отриманні стеків:", error);
     }
   };
 
-  // --- debounce для фільтрів ---
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      fetchClients();
-    }, 400);
-    return () => clearTimeout(debounceRef.current);
-  }, [filters, page]);
-
   useEffect(() => {
     fetchStacks();
-    fetchClients();
   }, []);
 
+  useEffect(() => {
+    fetchClients();
+  }, [page]);
+
+  // --- обробка фільтрів ---
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
-    setPage(1);
   };
 
-  // --- стабільна локальна фільтрація ---
+  // --- застосування фільтрів локально ---
   const filteredClients = clients.filter((client) => {
     const stackMatch =
       !filters.stack ||
-      client.stacks?.some((s) =>
-        s.name?.toLowerCase().includes(filters.stack.toLowerCase())
+      client.stacks?.some((stack) =>
+        stack.name?.toLowerCase().includes(filters.stack.toLowerCase())
       );
 
     const nameMatch =
@@ -92,9 +81,7 @@ export default function ClientsPage() {
         : client.deals?.some((deal) => {
             const dealTitleMatch =
               !filters.dealTitle ||
-              deal.title
-                ?.toLowerCase()
-                .includes(filters.dealTitle.toLowerCase());
+              deal.title?.toLowerCase().includes(filters.dealTitle.toLowerCase());
             const startDateMatch =
               !filters.startDate ||
               (deal.start_date &&
@@ -132,7 +119,7 @@ export default function ClientsPage() {
       {/* --- Фільтри --- */}
       <div className={styles.filters}>
         <Select
-          options={stacks.map((stack) => ({
+          options={(stacks || []).map((stack) => ({
             value: stack.name,
             label: stack.name,
           }))}
@@ -172,43 +159,37 @@ export default function ClientsPage() {
         />
       </div>
 
-      {loading ? (
-        <p>Завантаження...</p>
-      ) : (
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Стек</th>
-              <th>Назва</th>
-              <th>ЄДРПОУ</th>
-              <th>Угоди</th>
-              <th>Дата угоди</th>
-              <th>Сума</th>
-              <th>Валюта</th>
-              <th>Еквівалент (UAH)</th>
+      {/* --- Таблиця --- */}
+      <table className={styles.table}>
+        <thead>
+          <tr>
+            <th>Стек</th>
+            <th>Назва</th>
+            <th>ЄДРПОУ</th>
+            <th>Угоди</th>
+            <th>Дата угоди</th>
+            <th>Сума</th>
+            <th>Валюта</th>
+            <th>Еквівалент (UAH)</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredClients.map((client) => (
+            <tr key={client.id}>
+              <td>{client.stacks?.map((s) => s.name).join(", ") || "-"}</td>
+              <td>{client.name}</td>
+              <td>{client.edrpou}</td>
+              <td>{client.deals?.map((d) => d.title).join(", ") || "-"}</td>
+              <td>{client.deals?.map((d) => d.start_date).join(", ") || "-"}</td>
+              <td>{client.deals?.map((d) => d.amount).join(", ") || "-"}</td>
+              <td>{client.deals?.map((d) => d.currency).join(", ") || "-"}</td>
+              <td>{client.deals?.map((d) => d.amountUah).join(", ") || "-"}</td>
             </tr>
-          </thead>
-          <tbody>
-            {filteredClients.map((client) => (
-              <tr key={client.id}>
-                <td>{client.stacks?.map((s) => s.name).join(", ") || "-"}</td>
-                <td>{client.name}</td>
-                <td>{client.edrpou}</td>
-                <td>{client.deals?.map((d) => d.title).join(", ") || "-"}</td>
-                <td>
-                  {client.deals?.map((d) => d.start_date).join(", ") || "-"}
-                </td>
-                <td>{client.deals?.map((d) => d.amount).join(", ") || "-"}</td>
-                <td>{client.deals?.map((d) => d.currency).join(", ") || "-"}</td>
-                <td>
-                  {client.deals?.map((d) => d.amountUah).join(", ") || "-"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+          ))}
+        </tbody>
+      </table>
 
+      {/* --- Пагінація --- */}
       <div className={styles.pagination}>
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
