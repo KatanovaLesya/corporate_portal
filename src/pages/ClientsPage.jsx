@@ -94,6 +94,8 @@ export default function ClientsPage() {
       const normalized = normalizeClients(rawClients);
 
       // 🔍 Фільтр по угоді (з урахуванням стеків і клієнтів)
+      console.log("🔍 Приклад клієнта:", normalized[0]);
+
       const filteredByDealTitle = dealTitle
         ? normalized.filter((client) => {
             let hasMatch = false;
