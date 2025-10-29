@@ -93,15 +93,42 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      // 🔍 фільтр по назві угоди (працює навіть якщо deals є тільки на деяких клієнтах)
+      // 🔍 Фільтр по угоді (з урахуванням стеків і клієнтів)
       const filteredByDealTitle = dealTitle
-        ? normalized.filter((client) =>
-            Array.isArray(client.deals) &&
-            client.deals.some((deal) =>
-              deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
-            )
-          )
+        ? normalized.filter((client) => {
+            let hasMatch = false;
+
+            // 1️⃣ Якщо у клієнта є угоди напряму
+            if (Array.isArray(client.deals) && client.deals.length > 0) {
+              hasMatch = client.deals.some(
+                (deal) =>
+                  typeof deal.title === "string" &&
+                  deal.title.toLowerCase().includes(dealTitle.toLowerCase())
+              );
+            }
+
+            // 2️⃣ Якщо угоди знайдено у стеку — показуємо всіх клієнтів цього стека
+            if (!hasMatch && Array.isArray(client.stacks) && client.stacks.length > 0) {
+              for (const stack of client.stacks) {
+                if (Array.isArray(stack.deals) && stack.deals.length > 0) {
+                  const foundDeal = stack.deals.some(
+                    (deal) =>
+                      typeof deal.title === "string" &&
+                      deal.title.toLowerCase().includes(dealTitle.toLowerCase())
+                  );
+
+                  if (foundDeal) {
+                    hasMatch = true;
+                    break;
+                  }
+                }
+              }
+            }
+
+            return hasMatch;
+          })
         : normalized;
+
 
 
         
