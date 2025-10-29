@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
@@ -22,15 +22,16 @@ export default function ClientsPage() {
     amountUah: "",
   });
 
+  const [stackOptions, setStackOptions] = useState([]);
   const [currencyOptions, setCurrencyOptions] = useState([]);
   const debounceRef = useRef(null);
 
-  // --- нормалізація клієнтів та їхніх угод ---
-  const normalizeClients = (clients) => {
+  // --- нормалізація угод ---
+  function normalizeClients(clients) {
     return clients.map((client) => {
       const displayDeals = [];
 
-      // прямі угоди
+      // угоди, які напряму належать клієнту
       if (client.deals) {
         displayDeals.push(...client.deals.filter((d) => d.status === "active"));
       }
@@ -53,21 +54,19 @@ export default function ClientsPage() {
 
       return { ...client, displayDeals };
     });
-  };
+  }
 
-  // --- застосування фільтрів ---
-  const applyFilters = (clients, filters) => {
+  // --- фільтрація ---
+  function applyFilters(clients, filters) {
     return clients.filter((client) => {
       const matchStack =
         !filters.stack ||
         client.stacks?.some((s) =>
           s.name.toLowerCase().includes(filters.stack.toLowerCase())
         );
-
       const matchName =
         !filters.name ||
         client.name?.toLowerCase().includes(filters.name.toLowerCase());
-
       const matchEdrpou =
         !filters.edrpou ||
         client.edrpou?.toLowerCase().includes(filters.edrpou.toLowerCase());
@@ -97,17 +96,17 @@ export default function ClientsPage() {
 
       return matchStack && matchName && matchEdrpou && matchDeals;
     });
-  };
+  }
 
-  // --- отримання клієнтів з API ---
-  const fetchClients = useCallback(async () => {
+  // --- отримання клієнтів через API (твоя логіка збережена) ---
+  async function fetchClients() {
     setLoading(true);
     try {
       const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
-      const data = normalizeClients(res.data.clients || res.data.data || res.data || []);
+      const data = normalizeClients(res.data || []);
       const filtered = applyFilters(data, filters);
 
-      // формування валют
+      // валютні опції
       const allCurrencies = new Set();
       data.forEach((c) =>
         c.displayDeals?.forEach((d) => d.currency && allCurrencies.add(d.currency))
@@ -115,13 +114,13 @@ export default function ClientsPage() {
       setCurrencyOptions([...allCurrencies].map((c) => ({ value: c, label: c })));
 
       setRows(filtered);
-      setCount(res.data.total || filtered.length);
-    } catch (err) {
-      console.error("Error fetching clients:", err);
+      setCount(filtered.length);
+    } catch (error) {
+      console.error("Помилка при отриманні клієнтів:", error);
     } finally {
       setLoading(false);
     }
-  }, [page, filters]);
+  }
 
   // --- debounce фільтрів ---
   useEffect(() => {
@@ -145,7 +144,6 @@ export default function ClientsPage() {
     <div className={styles.wrapper}>
       <h2>Клієнти</h2>
 
-      {/* --- Фільтри --- */}
       <div className={styles.filters}>
         <input placeholder="Стек" onChange={(e) => handleFilterChange("stack", e.target.value)} />
         <input placeholder="Назва" onChange={(e) => handleFilterChange("name", e.target.value)} />
@@ -162,7 +160,6 @@ export default function ClientsPage() {
         <input placeholder="Еквівалент в UAH" onChange={(e) => handleFilterChange("amountUah", e.target.value)} />
       </div>
 
-      {/* --- Таблиця --- */}
       {loading ? (
         <p>Завантаження...</p>
       ) : (
@@ -211,7 +208,6 @@ export default function ClientsPage() {
         </table>
       )}
 
-      {/* --- Пагінація --- */}
       <div className={styles.pagination}>
         <button onClick={() => setPage((p) => Math.max(p - 1, 1))} disabled={page === 1}>
           ⬅ Попередня
