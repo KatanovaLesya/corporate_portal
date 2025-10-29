@@ -104,10 +104,12 @@ export default function ClientsPage() {
     setLoading(true);
     try {
       const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
+      console.log("🔍 API response:", res.data);
       const rawData = Array.isArray(res.data)
         ? res.data
         : res.data.clients || res.data.data || [];
       const data = normalizeClients(rawData);
+      console.log("✅ Normalized clients:", data);
       const filtered = applyFilters(data, filters);
 
       // валютні опції
