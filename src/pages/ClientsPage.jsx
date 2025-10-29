@@ -22,27 +22,25 @@ export default function ClientsPage() {
     amountUah: "",
   });
 
+  const [stackOptions, setStackOptions] = useState([]);
   const [currencyOptions, setCurrencyOptions] = useState([]);
   const debounceRef = useRef(null);
 
-  // --- нормалізація угод ---
-  function normalizeClients(clients) {
+  // --- нормалізація клієнтів та їхніх угод ---
+  const normalizeClients = (clients) => {
     return clients.map((client) => {
       const displayDeals = [];
 
-      // угоди, які напряму належать клієнту
       if (client.deals) {
-        displayDeals.push(...client.deals); // без фільтрації за статусом
+        displayDeals.push(...client.deals.filter((d) => d.status === "active"));
       }
 
-      // угоди зі стеків
       if (client.stacks) {
         client.stacks.forEach((stack) => {
           if (stack.deals) {
             stack.deals
-              .filter((d) => !d.client_id) // без статусу
+              .filter((d) => d.status === "active" && !d.client_id)
               .forEach((deal) => {
-                // показуємо тільки у першого клієнта стеку
                 if (stack.clients && stack.clients[0].id === client.id) {
                   displayDeals.push(deal);
                 }
@@ -53,21 +51,23 @@ export default function ClientsPage() {
 
       return { ...client, displayDeals };
     });
-  }
+  };
 
   // --- фільтрація ---
-  function applyFilters(clients, filters) {
+  const applyFilters = (clients, filters) => {
     if (!filters || Object.values(filters).every((v) => v === "")) return clients;
 
     return clients.filter((client) => {
       const matchStack =
         !filters.stack ||
         client.stacks?.some((s) =>
-          s.name.toLowerCase().includes(filters.stack.toLowerCase())
+          s.name?.toLowerCase().includes(filters.stack.toLowerCase())
         );
+
       const matchName =
         !filters.name ||
         client.name?.toLowerCase().includes(filters.name.toLowerCase());
+
       const matchEdrpou =
         !filters.edrpou ||
         client.edrpou?.toLowerCase().includes(filters.edrpou.toLowerCase());
@@ -97,44 +97,52 @@ export default function ClientsPage() {
 
       return matchStack && matchName && matchEdrpou && matchDeals;
     });
-  }
+  };
 
-  // --- отримання клієнтів через API ---
-  async function fetchClients() {
+  // --- отримання клієнтів ---
+  const fetchClients = async () => {
     setLoading(true);
     try {
       const res = await api.get(`/clients?page=${page}&limit=${PAGE_SIZE}`);
-      console.log("🔍 API response:", res.data);
-
       const rawData = Array.isArray(res.data)
         ? res.data
         : res.data.rows || res.data.clients || res.data.data || [];
 
       const data = normalizeClients(rawData);
-      console.log("✅ Normalized clients:", data);
-
       const filtered = applyFilters(data, filters);
 
-  // --- валютні опції ---
+      setRows(filtered);
+      setCount(res.data.count || filtered.length);
+
+      // валютні опції
       const allCurrencies = new Set();
       data.forEach((c) =>
         c.displayDeals?.forEach((d) => d.currency && allCurrencies.add(d.currency))
       );
       setCurrencyOptions([...allCurrencies].map((c) => ({ value: c, label: c })));
-
-  // 🟣 Ось тут цей рядок 👇
-      setCount(res.data.count || rawData.length);
-
-      setRows(filtered);
     } catch (error) {
       console.error("Помилка при отриманні клієнтів:", error);
     } finally {
       setLoading(false);
     }
+  };
 
-  }
+  // --- отримання стеків ---
+  const fetchStacks = async () => {
+    try {
+      const res = await api.get("/stacks");
+      setStackOptions(
+        res.data.map((stack) => ({
+          value: stack.name,
+          label: stack.name,
+        }))
+      );
+    } catch (error) {
+      console.error("Помилка при отриманні стеків:", error);
+    }
+  };
 
-  // --- debounce фільтрів ---
+  // --- debounce для фільтрів ---
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -148,6 +156,10 @@ export default function ClientsPage() {
     setPage(1);
   }, [filters]);
 
+  useEffect(() => {
+    fetchStacks();
+  }, []);
+
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
   };
@@ -158,7 +170,12 @@ export default function ClientsPage() {
 
       {/* --- Фільтри --- */}
       <div className={styles.filters}>
-        <input placeholder="Стек" onChange={(e) => handleFilterChange("stack", e.target.value)} />
+        <Select
+          options={stackOptions}
+          placeholder="Стек"
+          isClearable
+          onChange={(selected) => handleFilterChange("stack", selected?.value || "")}
+        />
         <input placeholder="Назва" onChange={(e) => handleFilterChange("name", e.target.value)} />
         <input placeholder="ЄДРПОУ" onChange={(e) => handleFilterChange("edrpou", e.target.value)} />
         <input placeholder="Угода (назва)" onChange={(e) => handleFilterChange("dealTitle", e.target.value)} />
@@ -199,12 +216,7 @@ export default function ClientsPage() {
                 <td>
                   {client.displayDeals?.length ? (
                     client.displayDeals.map((d, i) => (
-                      <div
-                        key={i}
-                        className={`${styles.dealTag} ${
-                          d.client_id ? styles.directDeal : styles.stackDeal
-                        }`}
-                      >
+                      <div key={i} className={styles.deal}>
                         {d.title || "-"}
                       </div>
                     ))
