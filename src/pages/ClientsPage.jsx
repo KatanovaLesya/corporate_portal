@@ -94,28 +94,7 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      // 🔍 Фільтр по назві угоди — працює і для угод клієнта, і для стеку
-      const filteredByDealTitle = dealTitle
-        ? normalized.filter(
-            (client) =>
-              Array.isArray(client.displayDeals) &&
-              client.displayDeals.some((deal) =>
-                deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
-              )
-          )
-        : normalized;
-
-      console.log("✅ Found deals filter:", filteredByDealTitle.map((c) => c.name));
-
-
-            // 🔹 Якщо користувач шукає по угоді — використовуємо filteredByDealTitle
-      // 🔹 Якщо ні — залишаємо normalized
-      const filteredData = dealTitle ? filteredByDealTitle : normalized;
-
-      // 🔹 Далі застосовуємо фільтр по сумі (як у тебе було)
-      setRows(applyAmountFilter(filteredData, filters));
-
-
+      setRows(applyAmountFilter(normalized, filters));
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
