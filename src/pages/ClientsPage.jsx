@@ -79,37 +79,50 @@ export default function ClientsPage() {
       console.log("🟢 FETCH START", { page, filters });
       setLoading(true);
         
-      const {amountUah, dealTitle, ...backendFilters} = filters;
+      const {amountUah, dealTitle, startDate, amount, currency, ...backendFilters} = filters;
       
       const res = await api.get("/clients", {
         params: {
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
           ...backendFilters,
-          ...(dealTitle ? {dealTitle} : {}), 
+          ...(dealTitle ? { dealTitle } : {}), 
+          ...(startDate ? { startDate } : {}),
+          ...(amount ? { amount } : {}),
+          ...(currency ? { currency } : {}),
         },
       });
         
-      console.log("🟢 REQUEST URL:", res.config.url);
       console.log("🟢 REQUEST PARAMS:", res.config.params);
       console.log("🟢 RESPONSE COUNT:", res.data.count);
       console.log("🟢 RESPONSE ROWS:", res.data.rows?.length || res.data.length);
-      console.log("🟢 RESPONSE EXAMPLE:", res.data.rows?.[0] || res.data[0]);
 
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      const filteredByDealTitle = dealTitle
-      ? normalized.filter((client) =>
-          Array.isArray(client.displayDeals) &&
-          client.displayDeals.some((deal) =>
-            deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
-          )
-        )
-      : normalized;
+      // 🔍 Локальний фільтр по угоді (назві, даті, сумі, валюті)
+      let filtered = normalized;
 
-      setRows(applyAmountFilter(filteredByDealTitle, filters));
+      if (dealTitle || startDate || amount || currency) {
+        filtered = normalized.filter((client) =>
+          Array.isArray(client.displayDeals) &&
+          client.displayDeals.some((deal) => {
+            const matchTitle = dealTitle
+              ? deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
+              : true;
+            const matchDate = startDate ? deal.start_date?.startsWith(startDate) : true;
+            const matchAmount = amount ? String(deal.amount) === String(amount) : true;
+            const matchCurrency = currency ? deal.currency === currency : true;
+            return matchTitle && matchDate && matchAmount && matchCurrency;
+          })
+        );
+      }
+
+      // 🔹 Потім фільтр по amountUah (як було)
+      const finalFiltered = applyAmountFilter(filtered, filters);
+
+      setRows(finalFiltered);
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
