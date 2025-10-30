@@ -140,7 +140,7 @@ export default function ClientsPage() {
     const totalPages = Math.ceil(count / PAGE_SIZE);
     
     // --- застосування фільтра по сумі в UAH ---
-    const filteredRows = applyAmountFilter(rows, filters);
+  const filteredRows = rows;
 
   return (
     <div>
