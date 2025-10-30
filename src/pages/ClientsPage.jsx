@@ -85,7 +85,7 @@ export default function ClientsPage() {
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
           ...backendFilters,
-          ...ClientsPage(dealTitle ? {dealTitle} : {}), 
+          ...(dealTitle ? {dealTitle} : {}), 
         },
       });
         
