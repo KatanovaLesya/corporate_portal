@@ -92,30 +92,41 @@ export default function ClientsPage() {
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
+      console.log("🧩 NORMALIZED EXAMPLE:", normalized.slice(0, 3));
+
 
       // --- 🔍 Фільтрація по угодах (на фронті) ---
       let filtered = normalized;
 
-      if (filters.dealTitle || filters.startDate || filters.amount || filters.currency) {
-        filtered = normalized.filter((client) =>
-          Array.isArray(client.displayDeals) &&
-          client.displayDeals.some((deal) => {
-            const matchTitle = filters.dealTitle
-              ? deal.title?.toLowerCase().includes(filters.dealTitle.toLowerCase())
-              : true;
-            const matchDate = filters.startDate
-              ? deal.start_date?.startsWith(filters.startDate)
-              : true;
-            const matchAmount = filters.amount
-              ? String(deal.amount).includes(String(filters.amount))
-              : true;
-            const matchCurrency = filters.currency
-              ? deal.currency === filters.currency
-              : true;
-            return matchTitle && matchDate && matchAmount && matchCurrency;
-          })
-        );
+      if (filters.dealTitle) {
+        const searchValue = filters.dealTitle.trim().toLowerCase();
+
+        filtered = normalized.filter((client) => {
+          if (!Array.isArray(client.displayDeals) || client.displayDeals.length === 0) return false;
+
+          // Перевіряємо назви угод у клієнта
+          const clientDealsMatch = client.displayDeals.some((deal) =>
+            deal.title?.toLowerCase().includes(searchValue)
+          );
+
+          // Перевіряємо також угоди стеку
+          const stackDealsMatch = Array.isArray(client.stacks)
+            ? client.stacks.some((stack) =>
+                Array.isArray(stack.deals)
+                  ? stack.deals.some((deal) =>
+                      deal.title?.toLowerCase().includes(searchValue)
+                    )
+                  : false
+              )
+            : false;
+
+          return clientDealsMatch || stackDealsMatch;
+        });
       }
+
+      console.log("🔍 DEAL FILTER:", filters.dealTitle);
+      console.log("✅ FILTERED CLIENTS:", filtered.map((c) => c.name));
+
 
       // --- 🔹 Фільтр по сумі в UAH (як у тебе було)
       const finalFiltered = applyAmountFilter(filtered, filters);
