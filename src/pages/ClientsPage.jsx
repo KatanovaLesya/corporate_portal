@@ -76,6 +76,7 @@ export default function ClientsPage() {
   // --- завантаження клієнтів з бекенду ---
   async function fetchClients() {
     try {
+      console.log("🟢 FETCH START", { page, filters });
       setLoading(true);
         
       const {amountUah, dealTitle, ...backendFilters} = filters;
@@ -89,7 +90,12 @@ export default function ClientsPage() {
         },
       });
         
-      console.log("rawClients ===>", res.data.rows || res.data);
+      console.log("🟢 REQUEST URL:", res.config.url);
+      console.log("🟢 REQUEST PARAMS:", res.config.params);
+      console.log("🟢 RESPONSE COUNT:", res.data.count);
+      console.log("🟢 RESPONSE ROWS:", res.data.rows?.length || res.data.length);
+      console.log("🟢 RESPONSE EXAMPLE:", res.data.rows?.[0] || res.data[0]);
+
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
