@@ -100,7 +100,16 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      setRows(applyAmountFilter(normalized, filters));
+      const filteredByDealTitle = dealTitle
+      ? normalized.filter((client) =>
+          Array.isArray(client.displayDeals) &&
+          client.displayDeals.some((deal) =>
+            deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
+          )
+        )
+      : normalized;
+
+      setRows(applyAmountFilter(filteredByDealTitle, filters));
       setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
