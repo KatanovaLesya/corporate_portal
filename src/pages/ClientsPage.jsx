@@ -93,61 +93,18 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      // 🔍 Фільтр по угоді (назві)
-      if (dealTitle) {
-        console.log("🔍 DEBUG DEAL FILTER ===>");
-        normalized.forEach((client) => {
-          const clientDeals = Array.isArray(client.deals) ? client.deals : [];
-          const stackDeals = Array.isArray(client.stacks)
-            ? client.stacks.flatMap((s) => (Array.isArray(s.deals) ? s.deals : []))
-            : [];
-
-          const allDeals = [...clientDeals, ...stackDeals];
-
-          const matched = allDeals.filter(
-            (d) =>
-              d.title &&
-              d.title.toLowerCase().includes(dealTitle.toLowerCase())
-          );
-
-          if (matched.length > 0) {
-            console.log("✅ MATCH:", client.name, "->", matched.map((m) => m.title));
-          } else {
-            console.log("❌ NO MATCH:", client.name);
-          }
-        });
-      }
-
-
-      // 🔍 Фільтр по угоді (працює через displayDeals)
+      // 🔍 Фільтр по назві угоди — працює і для угод клієнта, і для стеку
       const filteredByDealTitle = dealTitle
-        ? normalized.filter((client) => {
-          // 1️⃣ Угоди, що напряму в клієнта
-          const clientDeals = Array.isArray(client.deals)
-            ? client.deals
-            : [];
-
-          // 2️⃣ Угоди зі стеків, до яких належить клієнт
-          const stackDeals = Array.isArray(client.stacks)
-            ? client.stacks.flatMap((s) =>
-                Array.isArray(s.deals) ? s.deals : []
+        ? normalized.filter(
+            (client) =>
+              Array.isArray(client.displayDeals) &&
+              client.displayDeals.some((deal) =>
+                deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
               )
-            : [];
+          )
+        : normalized;
 
-          // 3️⃣ Об’єднуємо все в один список для перевірки
-          const allDeals = [...clientDeals, ...stackDeals];
-
-          // 4️⃣ Фільтр по назві угоди
-          return allDeals.some(
-            (deal) =>
-              deal.title &&
-              deal.title.toLowerCase().includes(dealTitle.toLowerCase())
-          );
-    })
-  : normalized;
-
-  console.log("✅ Found deals filter:", filteredByDealTitle.map(c => c.name));
-
+      console.log("✅ Found deals filter:", filteredByDealTitle.map((c) => c.name));
 
 
             // 🔹 Якщо користувач шукає по угоді — використовуємо filteredByDealTitle
