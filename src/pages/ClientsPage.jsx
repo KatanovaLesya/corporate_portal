@@ -74,62 +74,63 @@ export default function ClientsPage() {
   }
 
   // --- завантаження клієнтів з бекенду ---
+  
   async function fetchClients() {
     try {
       console.log("🟢 FETCH START", { page, filters });
       setLoading(true);
-        
-      const {amountUah, dealTitle, startDate, amount, currency, ...backendFilters} = filters;
-      
+
+      const { amountUah, ...backendFilters } = filters;
+
       const res = await api.get("/clients", {
         params: {
           limit: PAGE_SIZE,
           offset: (page - 1) * PAGE_SIZE,
           ...backendFilters,
-          ...(dealTitle ? { dealTitle } : {}), 
-          ...(startDate ? { startDate } : {}),
-          ...(amount ? { amount } : {}),
-          ...(currency ? { currency } : {}),
         },
       });
-        
-      console.log("🟢 REQUEST PARAMS:", res.config.params);
-      console.log("🟢 RESPONSE COUNT:", res.data.count);
-      console.log("🟢 RESPONSE ROWS:", res.data.rows?.length || res.data.length);
-
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      // 🔍 Локальний фільтр по угоді (назві, даті, сумі, валюті)
+      // --- 🔍 Фільтрація по угодах (на фронті) ---
       let filtered = normalized;
 
-      if (dealTitle || startDate || amount || currency) {
+      if (filters.dealTitle || filters.startDate || filters.amount || filters.currency) {
         filtered = normalized.filter((client) =>
           Array.isArray(client.displayDeals) &&
           client.displayDeals.some((deal) => {
-            const matchTitle = dealTitle
-              ? deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
+            const matchTitle = filters.dealTitle
+              ? deal.title?.toLowerCase().includes(filters.dealTitle.toLowerCase())
               : true;
-            const matchDate = startDate ? deal.start_date?.startsWith(startDate) : true;
-            const matchAmount = amount ? String(deal.amount) === String(amount) : true;
-            const matchCurrency = currency ? deal.currency === currency : true;
+            const matchDate = filters.startDate
+              ? deal.start_date?.startsWith(filters.startDate)
+              : true;
+            const matchAmount = filters.amount
+              ? String(deal.amount).includes(String(filters.amount))
+              : true;
+            const matchCurrency = filters.currency
+              ? deal.currency === filters.currency
+              : true;
             return matchTitle && matchDate && matchAmount && matchCurrency;
           })
         );
       }
 
-      // 🔹 Потім фільтр по amountUah (як було)
+      // --- 🔹 Фільтр по сумі в UAH (як у тебе було)
       const finalFiltered = applyAmountFilter(filtered, filters);
 
       setRows(finalFiltered);
-      setCount(res.data.count || 0);
+      setCount(finalFiltered.length);
+      console.log("✅ FILTERED CLIENTS:", finalFiltered.map((c) => c.name));
+
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
     } finally {
       setLoading(false);
     }
   }
+
 
   useEffect(() => {
   const delayDebounce = setTimeout(() => {
