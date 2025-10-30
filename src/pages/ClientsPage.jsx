@@ -110,8 +110,13 @@ export default function ClientsPage() {
   }
 
   useEffect(() => {
+  const delayDebounce = setTimeout(() => {
     fetchClients();
-  }, [page, filters]);
+  }, 300); // 300 мс затримка, щоб дочекатися оновлення filters
+
+  return () => clearTimeout(delayDebounce);
+}, [page, filters]);
+
 
   // --- завантаження стеків для фільтра ---
   useEffect(() => {
