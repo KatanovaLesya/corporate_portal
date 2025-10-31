@@ -27,6 +27,7 @@ export default function ClientsPage() {
 
   // --- нормалізація угод ---
   function normalizeClients(clients) {
+
     return clients.map((client) => {
       console.log("Client:", client.name, "Deals:", client.deals);
         
@@ -55,7 +56,7 @@ export default function ClientsPage() {
           }
         });
       }
-
+      console.log("🧱 Normalized client:", client.name, "deals:", client.deals?.map((d) => d.title),"stackDeals:", client.stacks?.flatMap((s) => s.deals?.map((d) => d.title)));
       return { ...client, displayDeals };
     });
   }
