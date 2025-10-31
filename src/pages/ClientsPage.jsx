@@ -268,12 +268,14 @@ export default function ClientsPage() {
             <th>
               Валюта
               <Select
-                options={[...new Set(rows.flatMap((r) =>
-                  r.displayDeals.map((d) => d.currency)
-                ))].map((c) => ({
-                  value: c,
-                  label: c,
-                }))}
+                options={Array.from(
+                  new Set(
+                    rows.flatMap((r) => r.displayDeals?.map((d) => d.currency) || [])
+                  )
+                )
+                  .filter(Boolean)
+                  .map((c) => ({ value: c, label: c }))}
+
                 onChange={(opt) => handleFilterChange("currency", opt?.value)}
                 isClearable
               />
