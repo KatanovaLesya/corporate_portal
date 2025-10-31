@@ -62,44 +62,54 @@ export default function ClientsPage() {
   }
     
   function applyFrontFilters(clients, filters) {
-      const filteredClients = clients
-        .map((client) => {
-          let displayDeals = client.displayDeals || [];
+    if (!clients || clients.length === 0) return [];
 
-          // --- Фільтр по сумі ---
-          if (filters.amountUah) {
-            displayDeals = displayDeals.filter((d) =>
-              String(d.amount).includes(filters.amountUah)
+    const filteredClients = clients
+      .map((client) => {
+        let displayDeals = client.displayDeals || [];
+
+        // --- фільтр по сумі ---
+        if (filters.amountUah || filters.amount) {
+          displayDeals = displayDeals.filter((d) => {
+            const amount = d.amount?.toString() || "";
+            return (
+              (!filters.amountUah || amount.includes(filters.amountUah)) &&
+              (!filters.amount || amount.includes(filters.amount))
             );
-          }
+          });
+        }
 
-          // --- Фільтр по валюті ---
-          if (filters.currency) {
-            displayDeals = displayDeals.filter((d) => d.currency === filters.currency);
-          }
+        // --- фільтр по валюті ---
+        if (filters.currency) {
+          displayDeals = displayDeals.filter((d) => d.currency === filters.currency);
+        }
 
-          // --- Фільтр по даті ---
-          if (filters.startDate) {
-            displayDeals = displayDeals.filter(
-              (d) => d.start_date && d.start_date.startsWith(filters.startDate)
-            );
-          }
+        // --- фільтр по даті ---
+        if (filters.startDate) {
+          displayDeals = displayDeals.filter(
+            (d) => d.start_date && d.start_date.startsWith(filters.startDate)
+          );
+        }
 
-          // --- Фільтр по назві угоди ---
-          if (filters.dealTitle) {
-            const query = filters.dealTitle.toLowerCase().trim();
-            displayDeals = displayDeals.filter((d) =>
-              d.title?.toLowerCase().includes(query)
-            );
-          }
+        // --- фільтр по назві угоди ---
+        if (filters.dealTitle) {
+          const query = filters.dealTitle.toLowerCase().trim();
+          displayDeals = displayDeals.filter(
+            (d) => d.title?.toLowerCase().includes(query)
+          );
+        }
 
-          return { ...client, displayDeals };
-        })
-        // ❗ Видаляємо клієнтів, у яких після фільтрів не залишилось жодної угоди
-        .filter((client) => client.displayDeals && client.displayDeals.length > 0);
+        return { ...client, displayDeals };
+      })
+      // залишаємо клієнтів з угодами або тих, у кого нема угод, але вони відповідають фільтру без угод
+      .filter(
+        (client) =>
+          (client.displayDeals && client.displayDeals.length > 0) ||
+          (!filters.dealTitle && !filters.amountUah && !filters.currency && !filters.startDate)
+      );
 
-      return filteredClients;
-    }
+    return filteredClients;
+  }
 
 
   // --- завантаження клієнтів з бекенду ---
@@ -139,7 +149,10 @@ export default function ClientsPage() {
 
       console.log("✅ DEAL FILTER:", dealTitle, filteredByDealTitle.map((c) => c.name));
 
-      setRows(applyFrontFilters(filteredByDealTitle, filters));
+      const filtered = applyFrontFilters(filteredByDealTitle, filters);
+      console.log("✅ After all filters:", filtered.map((c) => c.name));
+      setRows(filtered);
+
       setCount(res.data.count || 0);
 
     } catch (err) {
@@ -270,15 +283,16 @@ export default function ClientsPage() {
               <Select
                 options={Array.from(
                   new Set(
-                    rows.flatMap((r) => r.displayDeals?.map((d) => d.currency) || [])
+                    (rows || []).flatMap((r) => r.displayDeals?.map((d) => d.currency) || [])
                   )
                 )
                   .filter(Boolean)
                   .map((c) => ({ value: c, label: c }))}
-
+                value={filters.currency ? { value: filters.currency, label: filters.currency } : null}
                 onChange={(opt) => handleFilterChange("currency", opt?.value)}
                 isClearable
               />
+
             </th>
             <th>
               Еквівалент в UAH
