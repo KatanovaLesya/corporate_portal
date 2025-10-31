@@ -78,10 +78,9 @@ export default function ClientsPage() {
   
   async function fetchClients() {
     try {
-      console.log("🟢 FETCH START", { page, filters });
       setLoading(true);
 
-      const { amountUah, ...backendFilters } = filters;
+      const { amountUah, dealTitle, ...backendFilters } = filters;
 
       const res = await api.get("/clients", {
         params: {
@@ -90,62 +89,33 @@ export default function ClientsPage() {
           ...backendFilters,
         },
       });
+      console.log("rawClients ===>", res.data.rows || res.data);
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
-      console.log("🧩 NORMALIZED EXAMPLE:", normalized.slice(0, 3));
 
 
-      // --- 🔍 Фільтрація по угодах (на фронті) ---
-      let filtered = normalized;
-
-      if (filters.dealTitle) {
-        const searchValue = filters.dealTitle.trim().toLowerCase();
-
-        filtered = normalized.filter((client) => {
-          if (!Array.isArray(client.displayDeals)) return false;
-
-          // 🔹 1. Перевіряємо угоди клієнта
-          const clientDealsMatch = client.displayDeals.some((deal) => {
-            const title = String(deal.title || "").trim().toLowerCase();
-            return title.includes(searchValue);
-          });
-
-          // 🔹 2. Перевіряємо угоди стеків
-          const stackDealsMatch = Array.isArray(client.stacks)
-            ? client.stacks.some((stack) =>
-                Array.isArray(stack.deals)
-                  ? stack.deals.some((deal) => {
-                      const title = String(deal.title || "").trim().toLowerCase();
-                      return title.includes(searchValue);
-                    })
-                  : false
+  // ✅ Фільтр по угодах після нормалізації
+      const filteredByDealTitle = dealTitle
+        ? normalized.filter(
+            (client) =>
+              Array.isArray(client.displayDeals) &&
+              client.displayDeals.some((deal) =>
+                deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
               )
-            : false;
+          )
+        : normalized;
 
-          return clientDealsMatch || stackDealsMatch;
-        });
-      }
+      console.log("✅ DEAL FILTER:", dealTitle, filteredByDealTitle.map((c) => c.name));
 
-
-      console.log("🔍 DEAL FILTER:", filters.dealTitle);
-      console.log("✅ FILTERED CLIENTS:", filtered.map((c) => c.name));
-
-
-      // --- 🔹 Фільтр по сумі в UAH (як у тебе було)
-      const finalFiltered = applyAmountFilter(filtered, filters);
-
-      setRows(finalFiltered);
-      setCount(finalFiltered.length);
-      console.log("✅ FILTERED CLIENTS:", finalFiltered.map((c) => c.name));
-
+      setRows(applyAmountFilter(filteredByDealTitle, filters));
+      setCount(res.data.count || 0);
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
     } finally {
       setLoading(false);
     }
   }
-
 
   useEffect(() => {
   const delayDebounce = setTimeout(() => {
