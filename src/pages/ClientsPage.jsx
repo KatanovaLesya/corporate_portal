@@ -102,20 +102,22 @@ export default function ClientsPage() {
         const searchValue = filters.dealTitle.trim().toLowerCase();
 
         filtered = normalized.filter((client) => {
-          if (!Array.isArray(client.displayDeals) || client.displayDeals.length === 0) return false;
+          if (!Array.isArray(client.displayDeals)) return false;
 
-          // Перевіряємо назви угод у клієнта
-          const clientDealsMatch = client.displayDeals.some((deal) =>
-            deal.title?.toLowerCase().includes(searchValue)
-          );
+          // 🔹 1. Перевіряємо угоди клієнта
+          const clientDealsMatch = client.displayDeals.some((deal) => {
+            const title = String(deal.title || "").trim().toLowerCase();
+            return title.includes(searchValue);
+          });
 
-          // Перевіряємо також угоди стеку
+          // 🔹 2. Перевіряємо угоди стеків
           const stackDealsMatch = Array.isArray(client.stacks)
             ? client.stacks.some((stack) =>
                 Array.isArray(stack.deals)
-                  ? stack.deals.some((deal) =>
-                      deal.title?.toLowerCase().includes(searchValue)
-                    )
+                  ? stack.deals.some((deal) => {
+                      const title = String(deal.title || "").trim().toLowerCase();
+                      return title.includes(searchValue);
+                    })
                   : false
               )
             : false;
@@ -123,6 +125,7 @@ export default function ClientsPage() {
           return clientDealsMatch || stackDealsMatch;
         });
       }
+
 
       console.log("🔍 DEAL FILTER:", filters.dealTitle);
       console.log("✅ FILTERED CLIENTS:", filtered.map((c) => c.name));
