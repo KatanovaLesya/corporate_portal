@@ -62,17 +62,33 @@ export default function ClientsPage() {
   }
     
   // --- фільтрація на фронті ---
-  function applyAmountFilter(clients, filters) {
-      if (!filters.amountUah) return clients; 
+  function applyFrontFilters(clients, filters) {
+    return clients.map((client) => {
+      let displayDeals = client.displayDeals || [];
 
-      return clients.map((client) => {
-        const displayDeals = client.displayDeals.filter((d) => {
-          const amountUah = d.amount;
-          return String(amountUah).includes(filters.amountUah);
-        });
-        return { ...client, displayDeals };
-  });
+      // --- Фільтр по сумі ---
+      if (filters.amountUah) {
+        displayDeals = displayDeals.filter((d) =>
+          String(d.amount).includes(filters.amountUah)
+        );
+      }
+
+      // --- Фільтр по валюті ---
+      if (filters.currency) {
+        displayDeals = displayDeals.filter((d) => d.currency === filters.currency);
+      }
+
+      // --- Фільтр по даті ---
+      if (filters.startDate) {
+        displayDeals = displayDeals.filter(
+          (d) => d.start_date && d.start_date.startsWith(filters.startDate)
+        );
+      }
+
+      return { ...client, displayDeals };
+    });
   }
+
 
   // --- завантаження клієнтів з бекенду ---
   
@@ -111,8 +127,9 @@ export default function ClientsPage() {
 
       console.log("✅ DEAL FILTER:", dealTitle, filteredByDealTitle.map((c) => c.name));
 
-      setRows(applyAmountFilter(filteredByDealTitle, filters));
+      setRows(applyFrontFilters(filteredByDealTitle, filters));
       setCount(res.data.count || 0);
+
     } catch (err) {
       console.error("Помилка завантаження клієнтів:", err);
     } finally {
