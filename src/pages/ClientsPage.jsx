@@ -61,33 +61,45 @@ export default function ClientsPage() {
     });
   }
     
-  // --- фільтрація на фронті ---
   function applyFrontFilters(clients, filters) {
-    return clients.map((client) => {
-      let displayDeals = client.displayDeals || [];
+      const filteredClients = clients
+        .map((client) => {
+          let displayDeals = client.displayDeals || [];
 
-      // --- Фільтр по сумі ---
-      if (filters.amountUah) {
-        displayDeals = displayDeals.filter((d) =>
-          String(d.amount).includes(filters.amountUah)
-        );
-      }
+          // --- Фільтр по сумі ---
+          if (filters.amountUah) {
+            displayDeals = displayDeals.filter((d) =>
+              String(d.amount).includes(filters.amountUah)
+            );
+          }
 
-      // --- Фільтр по валюті ---
-      if (filters.currency) {
-        displayDeals = displayDeals.filter((d) => d.currency === filters.currency);
-      }
+          // --- Фільтр по валюті ---
+          if (filters.currency) {
+            displayDeals = displayDeals.filter((d) => d.currency === filters.currency);
+          }
 
-      // --- Фільтр по даті ---
-      if (filters.startDate) {
-        displayDeals = displayDeals.filter(
-          (d) => d.start_date && d.start_date.startsWith(filters.startDate)
-        );
-      }
+          // --- Фільтр по даті ---
+          if (filters.startDate) {
+            displayDeals = displayDeals.filter(
+              (d) => d.start_date && d.start_date.startsWith(filters.startDate)
+            );
+          }
 
-      return { ...client, displayDeals };
-    });
-  }
+          // --- Фільтр по назві угоди ---
+          if (filters.dealTitle) {
+            const query = filters.dealTitle.toLowerCase().trim();
+            displayDeals = displayDeals.filter((d) =>
+              d.title?.toLowerCase().includes(query)
+            );
+          }
+
+          return { ...client, displayDeals };
+        })
+        // ❗ Видаляємо клієнтів, у яких після фільтрів не залишилось жодної угоди
+        .filter((client) => client.displayDeals && client.displayDeals.length > 0);
+
+      return filteredClients;
+    }
 
 
   // --- завантаження клієнтів з бекенду ---
