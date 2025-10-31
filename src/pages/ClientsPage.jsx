@@ -100,9 +100,12 @@ export default function ClientsPage() {
         ? normalized.filter(
             (client) =>
               Array.isArray(client.displayDeals) &&
-              client.displayDeals.some((deal) =>
-                deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
-              )
+              client.displayDeals.some((deal) => {
+                const dealTitleClean = deal.title?.toString().trim().toLowerCase() || "";
+                const filterClean = dealTitle?.toString().trim().toLowerCase() || "";
+                return dealTitleClean.includes(filterClean);
+            })
+
           )
         : normalized;
 
