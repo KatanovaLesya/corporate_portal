@@ -119,13 +119,23 @@ export default function ClientsPage() {
 
       const { amountUah, ...backendFilters } = filters;
 
-      const res = await api.get("/clients", {
-        params: {
-          limit: PAGE_SIZE,
-          offset: (page - 1) * PAGE_SIZE,
-          ...backendFilters,
-        },
-      });
+      const queryParams = {
+        limit: PAGE_SIZE,
+        offset: (page - 1) * PAGE_SIZE,
+        ...Object.fromEntries(
+          Object.entries(backendFilters).filter(
+            ([, v]) => v !== "" && v !== null && v !== undefined
+          )
+        ),
+      };
+
+      // ✅ додаємо dealTitle, якщо він є
+      if (filters.dealTitle && filters.dealTitle.trim() !== "") {
+        queryParams.dealTitle = filters.dealTitle.trim();
+      }
+
+      const res = await api.get("/clients", { params: queryParams });
+
       console.log("rawClients ===>", res.data.rows || res.data);
 
       const rawClients = res.data.rows || [];
