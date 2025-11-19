@@ -33,6 +33,11 @@ export default function ClientsPage() {
         
       const displayDeals = [];
 
+      if (!client.deals && (!client.stacks || client.stacks.length === 0)) {
+        return { ...client, displayDeals: [] };
+}
+
+
       // угоди, які напряму належать клієнту
       if (client.deals) {
         displayDeals.push(
@@ -79,9 +84,11 @@ export default function ClientsPage() {
           });
         }
 
-        // --- фільтр по валюті ---
+       // --- фільтр по валюті ---
         if (filters.currency) {
-          displayDeals = displayDeals.filter((d) => d.currency === filters.currency);
+          displayDeals = displayDeals.filter(
+            (d) => d.currency?.toLowerCase() === filters.currency.toLowerCase()
+          );
         }
 
         // --- фільтр по даті ---
@@ -134,17 +141,26 @@ export default function ClientsPage() {
         queryParams.dealTitle = filters.dealTitle.trim();
       }
 
-      const res = await api.get("/clients", { params: queryParams });
+      const res = await api.get("/clients", {
+        params: {
+          ...queryParams,
+          ...(filters.amountUah ? { amount: filters.amountUah } : {}), // додай сюди UAH як amount
+        },
+      });
+
 
       console.log("rawClients ===>", res.data.rows || res.data);
+      console.log("🎯 Filters:", filters);
+      console.log("🎯 Filtered clients:", filtered.map(c => c.name));
+
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-
       const filtered = applyFrontFilters(normalized, filters);
-      console.log("✅ Всього клієнтів після фільтра:", filtered.length);
       setRows(filtered);
+
+
 
       setCount(res.data.count || 0);
 
