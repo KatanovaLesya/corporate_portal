@@ -109,25 +109,32 @@ export default function ClientsPage() {
       const filteredByDeals = normalized.filter((client) => {
         const deals = client.displayDeals || [];
 
+        // якщо фільтр по угодах не заданий — повертаємо клієнта як є
+        const isFilteringByDeals =
+          filters.dealTitle || filters.startDate || filters.amount || filters.currency || filters.amountUah;
+
+        if (!isFilteringByDeals) return true;
+
+        // якщо фільтри задані — перевіряємо угоди
         return deals.some((deal) => {
-          const matchTitle = dealTitle
-            ? deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
+          const matchTitle = filters.dealTitle
+            ? deal.title?.toLowerCase().includes(filters.dealTitle.toLowerCase())
             : true;
 
-          const matchDate = startDate
-            ? deal.start_date?.startsWith(startDate)
+          const matchDate = filters.startDate
+            ? deal.start_date?.startsWith(filters.startDate)
             : true;
 
-          const matchAmount = amount
-            ? String(deal.amount).includes(String(amount))
+          const matchAmount = filters.amount
+            ? String(deal.amount).includes(String(filters.amount))
             : true;
 
-          const matchCurrency = currency
-            ? deal.currency?.toLowerCase() === currency.toLowerCase()
+          const matchCurrency = filters.currency
+            ? deal.currency?.toLowerCase() === filters.currency.toLowerCase()
             : true;
 
-          const matchAmountUah = amountUah
-            ? String(deal.amount).includes(String(amountUah))
+          const matchAmountUah = filters.amountUah
+            ? String(deal.amount).includes(String(filters.amountUah))
             : true;
 
           return (
