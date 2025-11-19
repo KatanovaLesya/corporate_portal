@@ -117,7 +117,7 @@ export default function ClientsPage() {
     try {
       setLoading(true);
 
-      const { amountUah, dealTitle, ...backendFilters } = filters;
+      const { amountUah, ...backendFilters } = filters;
 
       const res = await api.get("/clients", {
         params: {
@@ -133,6 +133,7 @@ export default function ClientsPage() {
 
 
       const filtered = applyFrontFilters(normalized, filters);
+      console.log("✅ Всього клієнтів після фільтра:", filtered.length);
       setRows(filtered);
 
       setCount(res.data.count || 0);
