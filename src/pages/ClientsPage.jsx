@@ -132,24 +132,7 @@ export default function ClientsPage() {
       const normalized = normalizeClients(rawClients);
 
 
-  // ✅ Фільтр по угодах після нормалізації
-      const filteredByDealTitle = dealTitle
-        ? normalized.filter(
-            (client) =>
-              Array.isArray(client.displayDeals) &&
-              client.displayDeals.some((deal) => {
-                const dealTitleClean = deal.title?.toString().trim().toLowerCase() || "";
-                const filterClean = dealTitle?.toString().trim().toLowerCase() || "";
-                return dealTitleClean.includes(filterClean);
-            })
-
-          )
-        : normalized;
-
-      console.log("✅ DEAL FILTER:", dealTitle, filteredByDealTitle.map((c) => c.name));
-
-      const filtered = applyFrontFilters(filteredByDealTitle, filters);
-      console.log("✅ After all filters:", filtered.map((c) => c.name));
+      const filtered = applyFrontFilters(normalized, filters);
       setRows(filtered);
 
       setCount(res.data.count || 0);
