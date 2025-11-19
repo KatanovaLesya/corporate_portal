@@ -111,7 +111,6 @@ export default function ClientsPage() {
     return filteredClients;
   }
 
-
   // --- завантаження клієнтів з бекенду ---
   
   async function fetchClients() {
@@ -292,6 +291,7 @@ export default function ClientsPage() {
                 onChange={(opt) => handleFilterChange("currency", opt?.value)}
                 isClearable
               />
+
 
             </th>
             <th>
