@@ -109,9 +109,6 @@ export default function ClientsPage() {
       const filteredByDeals = normalized.filter((client) => {
         const deals = client.displayDeals || [];
 
-        // Якщо угод взагалі нема — не показуємо
-        if (deals.length === 0) return false;
-
         return deals.some((deal) => {
           const matchTitle = dealTitle
             ? deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
