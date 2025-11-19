@@ -113,7 +113,7 @@ export default function ClientsPage() {
         const isFilteringByDeals =
           filters.dealTitle || filters.startDate || filters.amount || filters.currency || filters.amountUah;
 
-        if (!isFilteringByDeals) return true;
+        if (!isFilteringByDeals && deals.length === 0) return true;
 
         // якщо фільтри задані — перевіряємо угоди
         return deals.some((deal) => {
