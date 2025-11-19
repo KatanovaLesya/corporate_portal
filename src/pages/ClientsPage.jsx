@@ -33,9 +33,9 @@ export default function ClientsPage() {
         
       const displayDeals = [];
 
-      if (!client.deals && (!client.stacks || client.stacks.length === 0)) {
-        return { ...client, displayDeals: [] };
-}
+  //    if (!client.deals && (!client.stacks || client.stacks.length === 0)) {
+  //      return { ...client, displayDeals: [] };
+//}
 
 
       // угоди, які напряму належать клієнту
@@ -66,56 +66,17 @@ export default function ClientsPage() {
     });
   }
     
-  function applyFrontFilters(clients, filters) {
-    if (!clients || clients.length === 0) return [];
+  // --- фільтр по еквіваленту (UAH) ---
+  function applyAmountFilter(clients, filters) {
+    if (!filters.amountUah) return clients;
 
-    const filteredClients = clients
-      .map((client) => {
-        let displayDeals = client.displayDeals || [];
-
-        // --- фільтр по сумі ---
-        if (filters.amountUah || filters.amount) {
-          displayDeals = displayDeals.filter((d) => {
-            const amount = d.amount?.toString() || "";
-            return (
-              (!filters.amountUah || amount.includes(filters.amountUah)) &&
-              (!filters.amount || amount.includes(filters.amount))
-            );
-          });
-        }
-
-       // --- фільтр по валюті ---
-        if (filters.currency) {
-          displayDeals = displayDeals.filter(
-            (d) => d.currency?.toLowerCase() === filters.currency.toLowerCase()
-          );
-        }
-
-        // --- фільтр по даті ---
-        if (filters.startDate) {
-          displayDeals = displayDeals.filter(
-            (d) => d.start_date && d.start_date.startsWith(filters.startDate)
-          );
-        }
-
-        // --- фільтр по назві угоди ---
-        if (filters.dealTitle) {
-          const query = filters.dealTitle.toLowerCase().trim();
-          displayDeals = displayDeals.filter(
-            (d) => d.title?.toLowerCase().includes(query)
-          );
-        }
-
-        return { ...client, displayDeals };
-      })
-      // залишаємо клієнтів з угодами або тих, у кого нема угод, але вони відповідають фільтру без угод
-      .filter(
-        (client) =>
-          (client.displayDeals && client.displayDeals.length > 0) ||
-          (!filters.dealTitle && !filters.amountUah && !filters.currency && !filters.startDate)
-      );
-
-    return filteredClients;
+    return clients.map((client) => {
+      const displayDeals = client.displayDeals.filter((d) => {
+        const amountUah = d.amount;
+        return String(amountUah).includes(filters.amountUah);
+      });
+      return { ...client, displayDeals };
+    });
   }
 
   // --- завантаження клієнтів з бекенду ---
@@ -124,27 +85,17 @@ export default function ClientsPage() {
     try {
       setLoading(true);
 
-      const { amountUah, ...backendFilters } = filters;
-
-      const queryParams = {
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-        ...Object.fromEntries(
-          Object.entries(backendFilters).filter(
-            ([, v]) => v !== "" && v !== null && v !== undefined
-          )
-        ),
-      };
-
-      // ✅ додаємо dealTitle, якщо він є
-      if (filters.dealTitle && filters.dealTitle.trim() !== "") {
-        queryParams.dealTitle = filters.dealTitle.trim();
-      }
+      const { amountUah, dealTitle, startDate, amount, currency, ...backendFilters } = filters;
 
       const res = await api.get("/clients", {
         params: {
-          ...queryParams,
-          ...(filters.amountUah ? { amount: filters.amountUah } : {}), // додай сюди UAH як amount
+          limit: PAGE_SIZE,
+          offset: (page - 1) * PAGE_SIZE,
+          ...Object.fromEntries(
+            Object.entries(backendFilters).filter(
+              ([, v]) => v !== "" && v !== null && v !== undefined
+            )
+          ),
         },
       });
 
@@ -154,14 +105,45 @@ export default function ClientsPage() {
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
-      const filtered = applyFrontFilters(normalized, filters);
+      // 🔍 Додаткова фільтрація по угодах після нормалізації
+      const filteredByDeals = normalized.filter((client) => {
+        const deals = client.displayDeals || [];
 
-      console.log("🎯 Filters:", filters);
-      console.log("🎯 Filtered clients:", filtered.map(c => c.name));
-      setRows(filtered);
+        // Якщо угод взагалі нема — не показуємо
+        if (deals.length === 0) return false;
 
+        return deals.some((deal) => {
+          const matchTitle = dealTitle
+            ? deal.title?.toLowerCase().includes(dealTitle.toLowerCase())
+            : true;
 
+          const matchDate = startDate
+            ? deal.start_date?.startsWith(startDate)
+            : true;
 
+          const matchAmount = amount
+            ? String(deal.amount).includes(String(amount))
+            : true;
+
+          const matchCurrency = currency
+            ? deal.currency?.toLowerCase() === currency.toLowerCase()
+            : true;
+
+          const matchAmountUah = amountUah
+            ? String(deal.amount).includes(String(amountUah))
+            : true;
+
+          return (
+            matchTitle &&
+            matchDate &&
+            matchAmount &&
+            matchCurrency &&
+            matchAmountUah
+          );
+        });
+      });
+
+      setRows(applyAmountFilter(filteredByDeals, filters));
       setCount(res.data.count || 0);
 
     } catch (err) {
