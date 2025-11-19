@@ -150,14 +150,14 @@ export default function ClientsPage() {
 
 
       console.log("rawClients ===>", res.data.rows || res.data);
-      console.log("🎯 Filters:", filters);
-      console.log("🎯 Filtered clients:", filtered.map(c => c.name));
-
 
       const rawClients = res.data.rows || [];
       const normalized = normalizeClients(rawClients);
 
       const filtered = applyFrontFilters(normalized, filters);
+
+      console.log("🎯 Filters:", filters);
+      console.log("🎯 Filtered clients:", filtered.map(c => c.name));
       setRows(filtered);
 
 
