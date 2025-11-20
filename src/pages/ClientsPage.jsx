@@ -243,6 +243,7 @@ export default function ClientsPage() {
             <th>
               Стек
               <Select
+                classNamePrefix="react-select"
                 options={stackOptions}
                 value={
                   filters.stack
@@ -323,6 +324,7 @@ export default function ClientsPage() {
             <th>
               Валюта
               <Select
+                classNamePrefix="react-select"
                 options={Array.from(
                   new Set(
                     (rows || []).flatMap((r) => r.displayDeals?.map((d) => d.currency) || [])
