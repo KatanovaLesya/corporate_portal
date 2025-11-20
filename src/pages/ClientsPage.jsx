@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
+import styles from "./ClientsPage.module.css"; 
+import styles from "./Dashboard.module.css"; 
 
 const PAGE_SIZE = 50;
 
