@@ -3,10 +3,11 @@ import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 
 const PAGE_SIZE = 50;
-const navigate = useNavigate();
 
 
 export default function ClientsPage() {
