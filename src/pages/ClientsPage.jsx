@@ -224,7 +224,7 @@ export default function ClientsPage() {
     <div className={styles.clientsContainer}>
       
       <h2 className={styles.title}>Клієнти</h2>
-      <button className={styles.backButton} onClick={() => navigate("/dashboard")}> ← Повернутись на дашборд </button>
+      <Link to="/dashboard" className={styles.backButton}> ← Повернутись на дашборд </Link>
 
       {loading && (
         <div className={styles.loaderWrapper}>
