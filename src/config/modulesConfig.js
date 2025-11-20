@@ -46,7 +46,7 @@ export const modules = [
   {
     name: "Нормативні дані",
     image: "/images/horse2.jpg",
-    path: "",
+    path: "/normative-data",
     roles: ["admin"],
     description: "Нормативні дані для розрахунків"
   },
