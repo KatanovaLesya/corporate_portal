@@ -146,8 +146,12 @@
 .table :global(.react-select__menu) {
     font-size: 14px;
 }
-.input {
-    padding-right: 1px;
+/* Відступ між чекбоксом і текстом */
+label input[type="checkbox"] {
+    margin-right: 2px;
+    /* або більше, якщо хочеш */
+    transform: translateY(1px);
+    /* трохи піднімає, щоб було по центру з текстом */
 }
 /* Адаптив */
 @media (max-width: 768px) {
