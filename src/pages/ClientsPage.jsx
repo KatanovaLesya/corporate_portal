@@ -224,7 +224,7 @@ export default function ClientsPage() {
     <div className={styles.clientsContainer}>
       
       <h2 className={styles.title}>Клієнти</h2>
-      <Link to="/dashboard" className={styles.backButton}> ← Головна </Link>
+      <Link to="/dashboard" className={styles.backButton}> DASHBOARD </Link>
 
       {loading && (
         <div className={styles.loaderWrapper}>
