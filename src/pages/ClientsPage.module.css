@@ -148,7 +148,7 @@
 }
 /* Відступ між чекбоксом і текстом */
 label input[type="checkbox"] {
-    margin-right: 2px;
+    margin-right: 8px;
     /* або більше, якщо хочеш */
     transform: translateY(1px);
     /* трохи піднімає, щоб було по центру з текстом */
