@@ -22,6 +22,7 @@ const AppRoutes = () => {
             <Route path="/admin" element={<AdminPanel />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/clients" element={<ClientsPage />} />
+            <Route path="/normative-data" element={<NormativeDataPage />} />
           </Route>
         </Route>
         {/* Сторінка без доступу */}
