@@ -114,6 +114,48 @@
     align-items: center;
 }
 
+/* Стиль для react-select — щоб був однаковий із input */
+.table :global(.react-select__control) {
+    height: 40px;
+    min-height: 40px;
+    border-radius: 6px;
+    border: 1px solid #d0d7de;
+    background-color: #fff;
+    font-size: 14px;
+    box-shadow: none;
+    transition: all 0.2s ease;
+}
+
+/* Вирівнюємо текст і падінги */
+.table :global(.react-select__value-container) {
+    padding: 2px 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Стиль для placeholder */
+.table :global(.react-select__placeholder) {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Іконка стрілочки — по центру */
+.table :global(.react-select__indicators) {
+    align-items: center;
+    height: 36px;
+}
+
+/* Фокусний стан — синя рамка */
+.table :global(.react-select__control--is-focused) {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+}
+
+/* Розмір шрифту у випадаючому списку */
+.table :global(.react-select__menu) {
+    font-size: 14px;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
