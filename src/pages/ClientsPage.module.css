@@ -84,9 +84,7 @@
 /* Вирівнюємо висоту всіх елементів фільтрації */
 .table input,
 .table :global(.react-select__control) {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  
     height: 40px;
     min-height: 40px;
     border-radius: 6px;
@@ -120,8 +118,7 @@
 
 /* Стиль для react-select — щоб був однаковий із input */
 .table :global(.react-select__control) {
-    display: flex;
-    align-items: center;
+  
     height: 40px;
     min-height: 40px;
     border-radius: 6px;
