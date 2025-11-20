@@ -257,7 +257,7 @@ export default function ClientsPage() {
                   })
                 }
                 isClearable
-                placeholder=""
+                placeholder="..."
               />
             </th>
             <th>
@@ -335,7 +335,7 @@ export default function ClientsPage() {
                 value={filters.currency ? { value: filters.currency, label: filters.currency } : null}
                 onChange={(opt) => handleFilterChange("currency", opt?.value)}
                 isClearable
-                placeholder=""
+                placeholder="..."
               />
 
 
