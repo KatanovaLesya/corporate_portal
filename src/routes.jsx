@@ -7,6 +7,8 @@ import AdminPanel from "./components/AdminPanel";
 import ProfilePage from "./pages/ProfilePage";
 import Layout from "./components/Layout"; 
 import ClientsPage from "./pages/ClientsPage";
+import NormativeDataPage from "./pages/NormativeDataPage";
+
 
 
 const AppRoutes = () => {
