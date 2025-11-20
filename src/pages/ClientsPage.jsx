@@ -88,15 +88,11 @@ export default function ClientsPage() {
       const { amountUah, dealTitle, startDate, amount, currency, ...backendFilters } = filters;
 
       const res = await api.get("/clients", {
-        params: {
-          limit: PAGE_SIZE,
-          offset: (page - 1) * PAGE_SIZE,
-          ...Object.fromEntries(
+        params: Object.fromEntries(
             Object.entries(backendFilters).filter(
               ([, v]) => v !== "" && v !== null && v !== undefined
             )
           ),
-        },
       });
 
 
@@ -163,7 +159,7 @@ export default function ClientsPage() {
   }, 300); // 300 мс затримка, щоб дочекатися оновлення filters
 
   return () => clearTimeout(delayDebounce);
-}, [page, filters]);
+}, [filters]);
 
 
   // --- завантаження стеків для фільтра ---
@@ -340,22 +336,6 @@ export default function ClientsPage() {
           ))}
         </tbody>
       </table>
-
-      {/* --- пагінація --- */}
-      <div style={{ marginTop: "10px" }}>
-        <button disabled={page <= 1} onClick={() => setPage(page - 1)}>
-          Назад
-        </button>
-        <span>
-          {page} / {totalPages || 1}
-        </span>
-        <button
-          disabled={page >= totalPages}
-          onClick={() => setPage(page + 1)}
-        >
-          Вперед
-        </button>
-      </div>
     </div>
   );
 }
