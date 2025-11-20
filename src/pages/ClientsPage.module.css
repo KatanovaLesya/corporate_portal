@@ -161,7 +161,7 @@ label input[type="checkbox"] {
     cursor: pointer;
     border-radius: 32px;
     border: none;
-    background-color: #be0713;
+    background-color: #f44336;
     color: white;
     transition: background 0.3s;
 }
