@@ -146,7 +146,9 @@
 .table :global(.react-select__menu) {
     font-size: 14px;
 }
-
+.input {
+    padding-right: 1px;
+}
 /* Адаптив */
 @media (max-width: 768px) {
 
