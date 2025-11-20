@@ -9,6 +9,8 @@ export default function ClientsPage() {
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [showOnlyWithDeals, setShowOnlyWithDeals] = useState(false);
+
 
   // --- фільтри ---
   const [filters, setFilters] = useState({
@@ -197,11 +199,37 @@ export default function ClientsPage() {
     // --- застосування фільтра по сумі в UAH ---
   const filteredRows = rows;
 
+  const visibleRows = showOnlyWithDeals
+    ? filteredRows.filter((client) => {
+        const hasActiveClientDeal =
+          client.displayDeals?.some((deal) => deal.status === "active");
+
+        const hasActiveStackDeal = client.stacks?.some((stack) =>
+          stack.deals?.some((deal) => deal.status === "active")
+        );
+
+        return hasActiveClientDeal || hasActiveStackDeal;
+      })
+    : filteredRows;
+
+
   return (
     <div>
       <h2>Клієнти</h2>
 
       {loading && <p>Завантаження...</p>}
+
+      <div style={{ marginBottom: "10px" }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={showOnlyWithDeals}
+            onChange={(e) => setShowOnlyWithDeals(e.target.checked)}
+          />
+          Активні угоди
+        </label>
+      </div>
+
 
       <table>
         <thead>
@@ -299,7 +327,7 @@ export default function ClientsPage() {
           </tr>
         </thead>
         <tbody>
-          {filteredRows.map((row, i) => (
+          {visibleRows.map((row, i) => (
             <tr key={i}>
               <td>
                 {row.stacks && row.stacks.length > 0
