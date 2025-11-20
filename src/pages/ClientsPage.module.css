@@ -149,13 +149,13 @@
 /* Відступ між чекбоксом і текстом */
 label input[type="checkbox"] {
     margin-right: 8px;
+    margin-top: 20px;
     /* або більше, якщо хочеш */
     transform: translateY(1px);
     /* трохи піднімає, щоб було по центру з текстом */
 }
 
 .backButton {
-    margin: 10px;
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
