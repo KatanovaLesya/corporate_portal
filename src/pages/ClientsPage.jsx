@@ -82,32 +82,80 @@ export default function ClientsPage() {
   // --- завантаження клієнтів з бекенду ---
   
   async function fetchClients() {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const res = await api.get("/clients", {
-      params: {
-        limit: PAGE_SIZE,
-        offset: (page - 1) * PAGE_SIZE,
-        ...Object.fromEntries(
-          Object.entries(filters).filter(
-            ([, v]) => v !== "" && v !== null && v !== undefined
-          )
-        ),
-      },
-    });
+      const { amountUah, dealTitle, startDate, amount, currency, ...backendFilters } = filters;
 
-    const rawClients = res.data.rows || [];
-    const normalized = normalizeClients(rawClients);
+      const res = await api.get("/clients", {
+        params: {
+          limit: PAGE_SIZE,
+          offset: (page - 1) * PAGE_SIZE,
+          ...Object.fromEntries(
+            Object.entries(backendFilters).filter(
+              ([, v]) => v !== "" && v !== null && v !== undefined
+            )
+          ),
+        },
+      });
 
-    setRows(normalized);
-    setCount(res.data.count || 0);
-  } catch (err) {
-    console.error("Помилка завантаження клієнтів:", err);
-  } finally {
-    setLoading(false);
+
+      console.log("rawClients ===>", res.data.rows || res.data);
+
+      const rawClients = res.data.rows || [];
+      const normalized = normalizeClients(rawClients);
+
+      // 🔍 Додаткова фільтрація по угодах після нормалізації
+      const filteredByDeals = normalized.filter((client) => {
+        const deals = client.displayDeals || [];
+
+        // якщо фільтр по угодах не заданий — повертаємо клієнта як є
+        const isFilteringByDeals =
+          filters.dealTitle || filters.startDate || filters.amount || filters.currency || filters.amountUah;
+
+        if (!isFilteringByDeals && deals.length === 0) return true;
+
+        // якщо фільтри задані — перевіряємо угоди
+        return deals.some((deal) => {
+          const matchTitle = filters.dealTitle
+            ? deal.title?.toLowerCase().includes(filters.dealTitle.toLowerCase())
+            : true;
+
+          const matchDate = filters.startDate
+            ? deal.start_date?.startsWith(filters.startDate)
+            : true;
+
+          const matchAmount = filters.amount
+            ? String(deal.amount).includes(String(filters.amount))
+            : true;
+
+          const matchCurrency = filters.currency
+            ? deal.currency?.toLowerCase() === filters.currency.toLowerCase()
+            : true;
+
+          const matchAmountUah = filters.amountUah
+            ? String(deal.amount).includes(String(filters.amountUah))
+            : true;
+
+          return (
+            matchTitle &&
+            matchDate &&
+            matchAmount &&
+            matchCurrency &&
+            matchAmountUah
+          );
+        });
+      });
+
+      setRows(applyAmountFilter(filteredByDeals, filters));
+      setCount(res.data.count || 0);
+
+    } catch (err) {
+      console.error("Помилка завантаження клієнтів:", err);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   useEffect(() => {
   const delayDebounce = setTimeout(() => {
