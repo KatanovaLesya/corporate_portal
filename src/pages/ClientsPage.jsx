@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
-import styles from "./ClientsPage.module.css"; 
-import styles from "./Dashboard.module.css"; 
+import styles from "./ClientsPage.module.css";
 
 const PAGE_SIZE = 50;
 
@@ -196,7 +195,7 @@ export default function ClientsPage() {
   };
 
   // --- кількість сторінок ---
-    const totalPages = Math.ceil(count / PAGE_SIZE);
+  const totalPages = Math.ceil(count / PAGE_SIZE);
     
     // --- застосування фільтра по сумі в UAH ---
   const filteredRows = rows;
@@ -216,12 +215,17 @@ export default function ClientsPage() {
 
 
   return (
-    <div>
-      <h2>Клієнти</h2>
+    <div className={styles.clientsContainer}>
+      <h2 className={styles.title}>Клієнти</h2>
 
-      {loading && <p>Завантаження...</p>}
+      {loading && (
+        <div className={styles.loaderWrapper}>
+          <div className={styles.loader}></div>
+          <p>Завантаження даних...</p>
+        </div>        
+      )}
 
-      <div style={{ marginBottom: "10px" }}>
+      <div className={styles.filterToggle}>
         <label>
           <input
             type="checkbox"
@@ -233,7 +237,7 @@ export default function ClientsPage() {
       </div>
 
 
-      <table>
+      <table className={styles.table}>
         <thead>
           <tr>
             <th>
