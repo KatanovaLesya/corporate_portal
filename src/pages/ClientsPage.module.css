@@ -86,6 +86,7 @@
 .table :global(.react-select__control) {
     display: flex;
     align-items: center;
+    justify-content: center;
     height: 40px;
     min-height: 40px;
     border-radius: 6px;
@@ -94,6 +95,7 @@
     box-sizing: border-box;
     font-size: 14px;
     padding: 0 8px;
+    margin: 0;
     transition: border 0.2s, box-shadow 0.2s;
 }
 
@@ -145,8 +147,9 @@
 
 /* Іконка стрілочки — по центру */
 .table :global(.react-select__indicators) {
+    display: flex;
     align-items: center;
-    height: 36px;
+    height: 100%;
 }
 
 /* Фокусний стан — синя рамка */
