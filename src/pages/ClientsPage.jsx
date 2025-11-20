@@ -2,8 +2,12 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
+import { useNavigate } from "react-router-dom";
+
 
 const PAGE_SIZE = 50;
+const navigate = useNavigate();
+
 
 export default function ClientsPage() {
   const [rows, setRows] = useState([]);
@@ -215,8 +219,11 @@ export default function ClientsPage() {
 
 
   return (
+
     <div className={styles.clientsContainer}>
+      
       <h2 className={styles.title}>Клієнти</h2>
+      <button className={styles.backButton} onClick={() => navigate("/dashboard")}> ← Повернутись на дашборд </button>
 
       {loading && (
         <div className={styles.loaderWrapper}>
