@@ -287,13 +287,30 @@ export default function ClientsPage() {
             </th>
             <th>
               Дата угоди
+              <div style={{ display: "flex", gap: "4px", alignItems: "center" }}>
               <input
                 type="date"
                 value={filters.startDate}
                 onChange={(e) =>
                   handleFilterChange("startDate", e.target.value)
                 }
+                style={{ flex: 1 }}
               />
+              {filters.startDate && (
+                <button
+                  onClick={() => handleFilterChange("startDate", "")}
+                  style={{
+                    border: "none",
+                    background: "#eee",
+                    borderRadius: "4px",
+                    padding: "4px 8px",
+                    cursor: "pointer",
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
             </th>
             <th>
               Сума
