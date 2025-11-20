@@ -81,6 +81,25 @@
     margin-bottom: 8px;
 }
 
+/* Вирівнюємо висоту всіх елементів фільтрації */
+.table input,
+.table :global(.react-select__control) {
+    height: 36px;
+    min-height: 36px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Для react-select вирівнюємо паддінги */
+.table :global(.react-select__value-container) {
+    padding: 2px 8px;
+}
+
+/* Для узгодження кнопки очищення select */
+.table :global(.react-select__indicators) {
+    height: 34px;
+}
+
 @keyframes spin {
     0% {
         transform: rotate(0deg);
