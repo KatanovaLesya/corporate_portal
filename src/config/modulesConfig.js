@@ -92,5 +92,6 @@ export const modules = [
     roles: ["admin", "commercialist"],
     description: "Показники для керівника компанії"
   },
+  
  
 ];

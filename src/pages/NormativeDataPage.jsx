@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import {
   getNormatives,
   createNormative,
@@ -9,7 +9,7 @@ import {
 import styles from "./NormativeDataPage.module.css";
 
 export default function NormativeDataPage() {
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
   const [normatives, setNormatives] = useState([]);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 
@@ -13,7 +13,7 @@ const PAGE_SIZE = 50;
 export default function ClientsPage() {
   const [rows, setRows] = useState([]);
   const [count, setCount] = useState(0);
-  const [page, setPage] = useState(1);
+  const [setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showOnlyWithDeals, setShowOnlyWithDeals] = useState(false);
 

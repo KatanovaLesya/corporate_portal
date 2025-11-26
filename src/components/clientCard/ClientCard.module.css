@@ -1,0 +1,26 @@
+.cardWrapper {
+    background: #fff;
+    border-radius: 24px;
+    padding: 32px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+}
+
+.loading {
+    margin-top: 20px;
+    color: #666;
+    font-style: italic;
+}
+
+.error {
+    margin-top: 20px;
+    color: #c0392b;
+    background: #fdecea;
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.placeholder {
+    color: #999;
+    font-style: italic;
+    margin-top: 20px;
+}
