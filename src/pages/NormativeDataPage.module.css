@@ -96,6 +96,7 @@
     cursor: pointer;
     transition: background 0.25s ease;
     font-weight: 500;
+    margin-bottom: 20px;
 }
 
 .normativesForm button:hover {
