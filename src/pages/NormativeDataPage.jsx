@@ -165,7 +165,7 @@ export default function NormativeDataPage() {
         <input
           type="text"
           placeholder="Рік"
-          value={selectedYear}
+          value=""
           className={styles.readonlyInput}
         />
         <input
