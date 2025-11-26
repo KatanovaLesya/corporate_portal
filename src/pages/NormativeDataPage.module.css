@@ -78,11 +78,17 @@
 
 .normativesForm textarea {
     min-width: 200px;
-    resize: vertical;
+    resize: none;
+    height: 38px;
+    padding: 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    flex: 1;
 }
 
 .normativesForm button {
-    background-color: #007bff;
+    background-color: #f44336;
     color: white;
     border: none;
     border-radius: 8px;
@@ -93,14 +99,7 @@
 }
 
 .normativesForm button:hover {
-    background-color: #005fc1;
-}
-
-.statusMessage {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    color: #007bff;
-    font-weight: 500;
+    background-color: #d32f2f;
 }
 
 .actionButtons {
@@ -120,4 +119,38 @@
 
 .actionButtons button:hover {
     opacity: 0.6;
+}
+
+.statusMessage {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: fit-content;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.statusMessage.success {
+    background-color: #e6f9ec;
+    color: #1b7a36;
+    border: 1px solid #a2dfb5;
+}
+
+.statusMessage.error {
+    background-color: #fdeaea;
+    color: #d93025;
+    border: 1px solid #f2b6b6;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
