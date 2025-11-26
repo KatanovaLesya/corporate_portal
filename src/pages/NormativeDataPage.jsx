@@ -6,7 +6,7 @@ import {
   updateNormative,
   deleteNormative,
 } from "../services/normativeService";
-import styles from "../components/AdminPanel.module.css";
+import styles from "./NormativeDataPage.module.css";
 
 export default function NormativeDataPage() {
   const navigate = useNavigate();
@@ -104,24 +104,25 @@ export default function NormativeDataPage() {
   };
 
   return (
-    <div className={styles.adminPanel}>
-      <h2>Нормативні параметри</h2>
+    <div className={styles.normativesPage}>
+      <div className={styles.normativesHeader}>
+        <h2>Нормативні параметри</h2>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <label>Рік: </label>
-        <select value={selectedYear} onChange={handleYearChange}>
-          {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+        <div>
+          <label>Рік: </label>
+          <select className={styles.yearSelect} value={selectedYear} onChange={handleYearChange}>
+            {[2024, 2025, 2026, 2027, 2028, 2029, 2030].map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
-
       {loading ? (
         <p>Завантаження...</p>
       ) : (
-        <table className={styles.table}>
+        <table className={styles.normativesTable}>
           <thead>
             <tr>
               <th>Назва</th>
@@ -154,7 +155,7 @@ export default function NormativeDataPage() {
 
       <h3>{editingItem ? "Редагування параметра" : "Додати новий параметр"}</h3>
 
-      <form onSubmit={handleSubmit} className={styles.form}>
+      <form onSubmit={handleSubmit} className={styles.normativesForm}>
         <input
           placeholder="Назва"
           value={formData.name}
@@ -199,7 +200,7 @@ export default function NormativeDataPage() {
         </button>
       </form>
 
-      {status && <p>{status}</p>}
+      {status && <p className={styles.statusMessage}>{status}</p>}
     </div>
   );
 }
