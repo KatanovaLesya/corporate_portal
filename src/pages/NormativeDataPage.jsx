@@ -108,7 +108,7 @@ export default function NormativeDataPage() {
     <div className={styles.normativesPage}>
       <div className={styles.normativesHeader}>
         <h2>Нормативні параметри</h2>
-        <Link to="/dashboard" className={styles.backButton}> DASHBOARD </Link>
+        
         <div>
           <label>Рік: </label>
           <select className={styles.yearSelect} value={selectedYear} onChange={handleYearChange}>
@@ -198,6 +198,8 @@ export default function NormativeDataPage() {
           {editingItem ? "💾 Зберегти зміни" : "➕ Додати"}
         </button>
       </form>
+      
+      <Link to="/dashboard" className={styles.backButton}> DASHBOARD </Link>
 
       {status && <p className={styles.statusMessage}>{status}</p>}
     </div>
