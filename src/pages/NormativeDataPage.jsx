@@ -166,7 +166,7 @@ export default function NormativeDataPage() {
           type="number"
           placeholder="Рік"
           value={formData.year}
-          onChange={(e) => setFormData({ ...formData, key: e.target.value })}
+          onChange={(e) => setFormData({ ...formData, year: e.target.value })}
           required
         />
         <input
