@@ -25,7 +25,7 @@ export default function ClientCard() {
       const res = await api.get("/clients");
       // Перевіримо, що саме приходить
       console.log("API /clients →", res.data);
-      setClients(res.data.clients || res.data || []);
+      setClients(res.data.rows || []);
     } catch (error) {
       console.error("Помилка при завантаженні клієнтів", error);
       setClients([]); // щоб не ламався .map
