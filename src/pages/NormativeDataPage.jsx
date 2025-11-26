@@ -48,7 +48,7 @@ export default function NormativeDataPage() {
   // Додавання / оновлення
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (isNaN(formData.value) || formData.value === "") {
   setStatus("⚠️ Введіть числове значення");
   return;
@@ -125,9 +125,9 @@ export default function NormativeDataPage() {
           <thead>
             <tr>
               <th>Назва</th>
+              <th>Рік</th>
               <th>Ключ</th>
               <th>Значення</th>
-              <th>Тип</th>
               <th>Одиниця</th>
               <th>Опис</th>
               <th>Дії</th>
@@ -137,9 +137,9 @@ export default function NormativeDataPage() {
             {normatives.map((n) => (
               <tr key={n.id}>
                 <td>{n.name}</td>
+                <td>{n.year}</td>
                 <td>{n.key}</td>
                 <td>{n.value}</td>
-                <td>{n.valueType}</td>
                 <td>{n.unit}</td>
                 <td>{n.description}</td>
                 <td>
