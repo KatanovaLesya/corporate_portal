@@ -48,6 +48,12 @@ export default function NormativeDataPage() {
   // Додавання / оновлення
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isNaN(formData.value) || formData.value === "") {
+  setStatus("⚠️ Введіть числове значення");
+  return;
+}
+
     try {
       if (editingItem) {
         await updateNormative(editingItem.id, formData);
