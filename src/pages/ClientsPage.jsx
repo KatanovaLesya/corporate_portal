@@ -7,12 +7,12 @@ import { Link } from "react-router-dom";
 
 
 
-const PAGE_SIZE = 50;
+//const PAGE_SIZE = 50;
 
 
 export default function ClientsPage() {
   const [rows, setRows] = useState([]);
-  const [count, setCount] = useState(0);
+  const [setCount] = useState(0);
   const [setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showOnlyWithDeals, setShowOnlyWithDeals] = useState(false);
@@ -93,8 +93,8 @@ export default function ClientsPage() {
     try {
       setLoading(true);
 
-      const { amountUah, dealTitle, startDate, amount, currency, ...backendFilters } = filters;
-
+      const { ...backendFilters } = filters;
+//amountUah, dealTitle, startDate, amount, currency, 
       const res = await api.get("/clients", {
         params: Object.fromEntries(
             Object.entries(backendFilters).filter(
@@ -200,7 +200,7 @@ export default function ClientsPage() {
   };
 
   // --- кількість сторінок ---
-  const totalPages = Math.ceil(count / PAGE_SIZE);
+  //const totalPages = Math.ceil(count / PAGE_SIZE);
     
     // --- застосування фільтра по сумі в UAH ---
   const filteredRows = rows;
