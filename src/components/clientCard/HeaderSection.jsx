@@ -10,12 +10,15 @@ export default function HeaderSection({ clients, selectedClientId, setSelectedCl
         style={{ padding: "8px", borderRadius: "8px" }}
       >
         <option value="">— Оберіть клієнта —</option>
-        {clients.map((c) => (
-          <option key={c.id} value={c.id}>
-            {c.name}
-          </option>
-        ))}
+
+        {Array.isArray(clients) &&
+          clients.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
       </select>
+
 
       {clientData && (
         <div style={{ marginTop: "10px", background: "#f7f7f7", padding: "10px", borderRadius: "6px" }}>
