@@ -46,7 +46,9 @@ export default function ClientCard() {
       setLoading(true);
       setError(null);
       try {
+        console.log("➡️ Запит деталей клієнта:", selectedClientId);
         const res = await api.get(`/clients/${selectedClientId}`);
+        console.log("✅ Відповідь клієнта:", res.data);
         setClientData(res.data);
       } catch (err) {
         console.error(err);
