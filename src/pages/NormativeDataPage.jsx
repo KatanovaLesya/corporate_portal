@@ -158,9 +158,11 @@ export default function NormativeDataPage() {
         <input
           type="number"
           placeholder="Рік"
-          value={selectedYear}
-          readOnly
-          disabled
+          value={formData.year}
+          onChange={(e) =>
+            setFormData({ ...formData, year: parseInt(e.target.value) })
+          }
+          required
         />
         <input
           placeholder="Ключ"
