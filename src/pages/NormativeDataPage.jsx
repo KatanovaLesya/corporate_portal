@@ -107,7 +107,7 @@ export default function NormativeDataPage() {
     <div className={styles.normativesPage}>
       <div className={styles.normativesHeader}>
         <h2>Нормативні параметри</h2>
-
+        <Link to="/dashboard" className={styles.backButton}> DASHBOARD </Link>
         <div>
           <label>Рік: </label>
           <select className={styles.yearSelect} value={selectedYear} onChange={handleYearChange}>

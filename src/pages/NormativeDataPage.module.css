@@ -143,6 +143,21 @@
     border: 1px solid #f2b6b6;
 }
 
+.backButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 32px;
+    border: none;
+    background-color: black;
+    color: white;
+    transition: background 0.3s;
+}
+
+.backButton:hover {
+    background-color: #000000;
+}
+
 @keyframes fadeIn {
     from {
         opacity: 0;
