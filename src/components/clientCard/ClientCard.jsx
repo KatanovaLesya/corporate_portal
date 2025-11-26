@@ -20,17 +20,20 @@ export default function ClientCard() {
 
   // 🔹 завантажуємо список клієнтів при старті
   useEffect(() => {
-    const fetchClients = async () => {
-      try {
-        const res = await api.get("/clients");
-        setClients(res.data);
-      } catch (err) {
-        console.error(err);
-        setError("Не вдалося завантажити список клієнтів.");
-      }
-    };
-    fetchClients();
-  }, []);
+  const fetchClients = async () => {
+    try {
+      const res = await api.get("/clients");
+      // Перевіримо, що саме приходить
+      console.log("API /clients →", res.data);
+      setClients(res.data.clients || res.data || []);
+    } catch (error) {
+      console.error("Помилка при завантаженні клієнтів", error);
+      setClients([]); // щоб не ламався .map
+    }
+  };
+
+  fetchClients();
+}, []);
 
   // 🔹 коли обрали клієнта — тягнемо його деталі
   useEffect(() => {
