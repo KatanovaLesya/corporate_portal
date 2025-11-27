@@ -171,7 +171,7 @@ label input[type="checkbox"] {
     bottom: -2px;
     width: 0%;
     height: 2px;
-    background-color: #c5a463;
+    background-color: #f44336;
     /* теплий золотавий відтінок */
     transition: width 0.3s ease;
     border-radius: 1px;
