@@ -166,6 +166,7 @@ export default function ClientsPage() {
   }, 300); // 300 мс затримка, щоб дочекатися оновлення filters
 
   return () => clearTimeout(delayDebounce);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [filters]);
 
 
