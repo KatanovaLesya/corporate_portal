@@ -10,8 +10,10 @@ import WorkVolumesSection from "./WorkVolumesSection";
 import TurnoverControlSection from "./TurnoverControlSection";
 import BalancesSection from "./BalancesSection";
 import UnitEconomicsSection from "./UnitEconomicsSection";
+import PropTypes from "prop-types";
 
-export default function ClientCard() {
+
+export default function ClientCard({ onClientChange }) {
   const [clients, setClients] = useState([]);
   const [selectedClientId, setSelectedClientId] = useState("");
   const [clientData, setClientData] = useState(null);
@@ -60,6 +62,18 @@ export default function ClientCard() {
 
     fetchClientDetails();
   }, [selectedClientId]);
+
+  // 🔹 коли змінився клієнт — передаємо його назву наверх
+  useEffect(() => {
+    if (clientData && onClientChange) {
+      onClientChange(clientData.name || "");
+    }
+  }, [clientData, onClientChange]);
+
+  ClientCard.propTypes = {
+  onClientChange: PropTypes.func,
+};
+
 
   return (
     <div className={styles.cardWrapper}>
