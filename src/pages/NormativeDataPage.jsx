@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 //import { useNavigate } from "react-router-dom";
 import {
   getNormatives,
@@ -198,8 +197,6 @@ export default function NormativeDataPage() {
           {editingItem ? "💾 Зберегти зміни" : "➕ Додати"}
         </button>
       </form>
-      
-      <Link to="/dashboard" className={styles.backButton}> DASHBOARD </Link>
 
       {status && <p className={styles.statusMessage}>{status}</p>}
     </div>
