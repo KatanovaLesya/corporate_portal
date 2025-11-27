@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Home } from "lucide-react"; // Можеш замінити на будь-яку іконку
 import styles from "./BackToDashboardButton.module.css";
+import { TextAlignJustify } from "lucide-react";
 
 export default function BackToDashboardButton() {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ export default function BackToDashboardButton() {
       onClick={() => navigate("/dashboard")}
       title="Повернутися на Дашборд"
     >
-      <Home size={18} />
+      <TextAlignJustify size={22} strokeWidth={2} />
       <span>Дашборд</span>
     </button>
   );
