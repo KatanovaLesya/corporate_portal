@@ -1,0 +1,22 @@
+.headerSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.label {
+    font-weight: 600;
+    color: #333;
+}
+
+.clientInfo {
+    background: #f9fafb;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.95rem;
+    color: #222;
+}
