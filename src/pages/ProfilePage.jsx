@@ -2,7 +2,6 @@ import { useEffect, useState, useRef } from "react";
 import { getCurrentUser, patchProfile, uploadAvatar } from "../services/authService";
 import styles from "./ProfilePage.module.css";
 import PropTypes from "prop-types";
-import { useNavigate } from "react-router-dom";
 import { MdCancel } from "react-icons/md";
 import { IoSave } from "react-icons/io5";
 
@@ -28,7 +27,7 @@ const ProfilePage = () => {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const fileInputRef = useRef();
-  const navigate = useNavigate();
+ 
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -201,8 +200,6 @@ const ProfilePage = () => {
           </div>
         </div>
       </div>
-      
-      <button className={styles["profile-btn-dashboard"]} onClick={() => navigate("/dashboard")}>DASHBOARD</button>
       
     </div>
   );
