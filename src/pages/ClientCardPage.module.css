@@ -75,3 +75,14 @@
     font-style: italic;
     margin-top: 20px;
 }
+
+.clientLink {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.clientLink:hover {
+    text-decoration: underline;
+    color: #0056b3;
+}

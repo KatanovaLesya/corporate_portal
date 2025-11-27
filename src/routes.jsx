@@ -30,6 +30,7 @@ const AppRoutes = () => {
             <Route path="/clients" element={<ClientsPage />} />
             <Route path="/normative-data" element={<NormativeDataPage />} />
             <Route path="/client-card" element={<ClientCardPage />} />
+            <Route path="/client-card/:id" element={<ClientCardPage />} />
           </Route>
         </Route>
         {/* Сторінка без доступу */}

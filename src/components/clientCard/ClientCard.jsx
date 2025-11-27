@@ -12,37 +12,45 @@ import BalancesSection from "./BalancesSection";
 import UnitEconomicsSection from "./UnitEconomicsSection";
 import PropTypes from "prop-types";
 
-
-export default function ClientCard({ onClientChange }) {
+export default function ClientCard({ onClientChange, initialClientData }) {
   const [clients, setClients] = useState([]);
   const [selectedClientId, setSelectedClientId] = useState("");
-  const [clientData, setClientData] = useState(null);
+  const [clientData, setClientData] = useState(initialClientData || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // 🔹 завантажуємо список клієнтів при старті
   useEffect(() => {
-  const fetchClients = async () => {
-    try {
-      const res = await api.get("/clients");
-      // Перевіримо, що саме приходить
-      console.log("API /clients →", res.data);
-      setClients(res.data.rows || []);
-    } catch (error) {
-      console.error("Помилка при завантаженні клієнтів", error);
-      setClients([]); // щоб не ламався .map
+    const fetchClients = async () => {
+      try {
+        const res = await api.get("/clients");
+        console.log("API /clients →", res.data);
+        setClients(res.data.rows || []);
+      } catch (error) {
+        console.error("Помилка при завантаженні клієнтів", error);
+        setClients([]);
+      }
+    };
+    fetchClients();
+  }, []);
+
+  // 🔹 якщо є initialClientData (наприклад, із /client-card/:id)
+  useEffect(() => {
+    if (initialClientData) {
+      setClientData(initialClientData);
+      setSelectedClientId(initialClientData.id);
     }
-  };
+  }, [initialClientData]);
 
-  fetchClients();
-}, []);
-
-  // 🔹 коли обрали клієнта — тягнемо його деталі
+  // 🔹 коли обрали клієнта вручну — тягнемо його деталі
   useEffect(() => {
     if (!selectedClientId) {
       setClientData(null);
       return;
     }
+
+    // якщо вже маємо дані (наприклад, із initialClientData), не перезапитуємо
+    if (initialClientData && initialClientData.id === selectedClientId) return;
 
     const fetchClientDetails = async () => {
       setLoading(true);
@@ -61,7 +69,7 @@ export default function ClientCard({ onClientChange }) {
     };
 
     fetchClientDetails();
-  }, [selectedClientId]);
+  }, [selectedClientId, initialClientData]);
 
   // 🔹 коли змінився клієнт — передаємо його назву наверх
   useEffect(() => {
@@ -71,9 +79,9 @@ export default function ClientCard({ onClientChange }) {
   }, [clientData, onClientChange]);
 
   ClientCard.propTypes = {
-  onClientChange: PropTypes.func,
-};
-
+    onClientChange: PropTypes.func,
+    initialClientData: PropTypes.object,
+  };
 
   return (
     <div className={styles.cardWrapper}>
@@ -84,11 +92,9 @@ export default function ClientCard({ onClientChange }) {
         clientData={clientData}
       />
 
-      {/* 🔹 стани */}
       {loading && <p className={styles.loading}>Завантаження даних...</p>}
       {error && <p className={styles.error}>{error}</p>}
 
-      {/* 🔹 секції клієнта */}
       {!loading && clientData && (
         <>
           <ContactsSection client={clientData} />
@@ -101,9 +107,10 @@ export default function ClientCard({ onClientChange }) {
         </>
       )}
 
-      {/* 🔹 коли клієнт ще не обраний */}
-      {!selectedClientId && !loading && (
-        <p className={styles.placeholder}>Оберіть клієнта зі списку вище, щоб переглянути деталі.</p>
+      {!selectedClientId && !loading && !initialClientData && (
+        <p className={styles.placeholder}>
+          Оберіть клієнта зі списку вище, щоб переглянути деталі.
+        </p>
       )}
     </div>
   );

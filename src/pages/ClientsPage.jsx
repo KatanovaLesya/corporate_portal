@@ -3,6 +3,8 @@ import api from "../services/api";
 import Select from "react-select";
 import styles from "./ClientsPage.module.css";
 //import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+
 
 
 
@@ -367,7 +369,19 @@ export default function ClientsPage() {
                   ? row.stacks.map((s) => s.name).join(", ")
                   : "-"}
               </td>
-              <td>{row.name}</td>
+              <td>
+                {row.id ? (
+                  <Link
+                    to={`/client-card/${row.id}`}
+                    className={styles.clientLink}
+                  >
+                    {row.name}
+                  </Link>
+                ) : (
+                  row.name
+                )}
+              </td>
+
               <td>{row.edrpou}</td>
               <td>
                 {row.displayDeals.length > 0
