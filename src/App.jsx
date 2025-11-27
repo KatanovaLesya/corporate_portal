@@ -1,7 +1,13 @@
 import AppRoutes from './routes'
+import BackToDashboardButton from './components/BackToDashboardButton';
 
 function App() {
-  return <AppRoutes />;
+  return (
+    <>
+      <AppRoutes />
+      <BackToDashboardButton />
+    </>
+  );
 }
 
 export default App;
