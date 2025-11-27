@@ -34,13 +34,20 @@ export default function ClientCard({ onClientChange, initialClientData }) {
     fetchClients();
   }, []);
 
-  // 🔹 якщо є initialClientData (наприклад, із /client-card/:id)
+  // 🔹 якщо є initialClientData (наприклад, із /client-card/:id) або id з URL
   useEffect(() => {
     if (initialClientData) {
       setClientData(initialClientData);
       setSelectedClientId(initialClientData.id);
+    } else if (window.location.pathname.startsWith("/client-card/")) {
+      // якщо даних ще немає, але є id у URL — витягуємо його з адреси
+      const idFromUrl = window.location.pathname.split("/").pop();
+      if (idFromUrl) {
+        setSelectedClientId(idFromUrl);
+      }
     }
   }, [initialClientData]);
+
 
   // 🔹 коли обрали клієнта вручну — тягнемо його деталі
   useEffect(() => {
