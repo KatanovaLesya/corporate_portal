@@ -92,7 +92,7 @@ export default function ClientsPage() {
     try {
       setLoading(true);
 
-      const { ...backendFilters } = filters;
+      const { amountUah, dealTitle, startDate, amount, currency, ...backendFilters } = filters;
 //amountUah, dealTitle, startDate, amount, currency, 
       const res = await api.get("/clients", {
         params: Object.fromEntries(
