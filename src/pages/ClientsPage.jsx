@@ -6,13 +6,13 @@ import styles from "./ClientsPage.module.css";
 
 
 
-//const PAGE_SIZE = 50;
+const PAGE_SIZE = 50;
 
 
 export default function ClientsPage() {
   const [rows, setRows] = useState([]);
-  const [setCount] = useState(0);
-  const [setPage] = useState(1);
+  const [count, setCount] = useState(0);
+  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showOnlyWithDeals, setShowOnlyWithDeals] = useState(false);
 
@@ -200,7 +200,7 @@ export default function ClientsPage() {
   };
 
   // --- кількість сторінок ---
-  //const totalPages = Math.ceil(count / PAGE_SIZE);
+  const totalPages = Math.ceil(count / PAGE_SIZE);
     
     // --- застосування фільтра по сумі в UAH ---
   const filteredRows = rows;
