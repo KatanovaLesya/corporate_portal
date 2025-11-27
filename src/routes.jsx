@@ -9,12 +9,15 @@ import Layout from "./components/Layout";
 import ClientsPage from "./pages/ClientsPage";
 import NormativeDataPage from "./pages/NormativeDataPage";
 import ClientCardPage from "./pages/ClientCardPage";
+import BackToDashboardButton from "./components/BackToDashboardButton";
+
 
 
 
 const AppRoutes = () => {
   return (
     <Router>
+      <BackToDashboardButton />
       <Routes>
         <Route path="/" element={<Home />} />
 
