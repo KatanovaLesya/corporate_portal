@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 export default function HeaderSection({ clients, selectedClientId, setSelectedClientId, clientData }) {
   return (
     <div style={{ marginBottom: "20px" }}>
-      <h3>Header Section</h3>
+      <h3></h3>
       <select
         value={selectedClientId}
         onChange={(e) => setSelectedClientId(e.target.value)}
