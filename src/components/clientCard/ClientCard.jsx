@@ -66,6 +66,7 @@ export default function ClientCard({ onClientChange, initialClientData }) {
         console.log("➡️ Запит деталей клієнта:", selectedClientId);
         const res = await api.get(`/clients/${selectedClientId}`);
         console.log("✅ Відповідь клієнта:", res.data);
+        console.log("📞 Контакти клієнта:", res.data.contacts);
         setClientData(res.data);
       } catch (err) {
         console.error(err);
