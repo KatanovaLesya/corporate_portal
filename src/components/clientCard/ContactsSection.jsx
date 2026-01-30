@@ -66,7 +66,7 @@ export default function ContactsSection({ client, onRefreshClient }) {
 
         // 2. Привʼязуємо до клієнта
         await api.post(`/clients/${client.id}/contacts`, {
-          contactId: contactRes.data.id
+          contact_id: contactRes.data.id
         });
       }
 
