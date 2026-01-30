@@ -25,7 +25,7 @@ export default function ContactsSection({ client, onRefreshClient }) {
   const copyToClipboard = async (value) => {
   try {
     await navigator.clipboard.writeText(value);
-    toast.error("Скопійовано");
+    toast.success("Скопійовано");
   } catch (e) {
     toast.error("Не вдалося скопіювати");
   }
