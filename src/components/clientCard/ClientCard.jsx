@@ -48,18 +48,7 @@ export default function ClientCard({ onClientChange, initialClientData }) {
     }
   }, [initialClientData]);
 
-
-  // 🔹 коли обрали клієнта вручну — тягнемо його деталі
-  useEffect(() => {
-    if (!selectedClientId) {
-      setClientData(null);
-      return;
-    }
-
-    // якщо вже маємо дані (наприклад, із initialClientData), не перезапитуємо
-    if (initialClientData && initialClientData.id === selectedClientId) return;
-
-    const fetchClientDetails = async () => {
+const fetchClientDetails = async () => {
       setLoading(true);
       setError(null);
       try {
@@ -75,6 +64,15 @@ export default function ClientCard({ onClientChange, initialClientData }) {
         setLoading(false);
       }
     };
+  // 🔹 коли обрали клієнта вручну — тягнемо його деталі
+  useEffect(() => {
+    if (!selectedClientId) {
+      setClientData(null);
+      return;
+    }
+
+    // якщо вже маємо дані (наприклад, із initialClientData), не перезапитуємо
+    if (initialClientData && initialClientData.id === selectedClientId) return;
 
     fetchClientDetails();
   }, [selectedClientId, initialClientData]);
@@ -105,7 +103,11 @@ export default function ClientCard({ onClientChange, initialClientData }) {
 
       {!loading && clientData && (
         <>
-          <ContactsSection client={clientData} />
+          <ContactsSection
+            client={clientData}
+            onRefreshClient={fetchClientDetails}
+          />
+
           <ChatsSection client={clientData} />
           <DealsSection client={clientData} />
           <WorkVolumesSection client={clientData} />

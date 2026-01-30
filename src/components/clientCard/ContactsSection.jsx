@@ -1,31 +1,133 @@
+import { useState } from "react";
+import api from "../../services/api";
 import PropTypes from "prop-types";
 
-export default function ContactsSection({ client }) {
+const emptyForm = {
+  name: "",
+  phone: "",
+  email: "",
+  telegram: "",
+  position: "",
+  birthday: ""
+};
+
+export default function ContactsSection({ client, onRefreshClient }) {
+  const [mode, setMode] = useState("view"); // view | create | edit
+  const [formData, setFormData] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [saving, setSaving] = useState(false);
+
+  const startCreate = () => {
+    setMode("create");
+    setFormData(emptyForm);
+    setEditingId(null);
+  };
+
+  const startEdit = (contact) => {
+    setMode("edit");
+    setFormData({
+      name: contact.name || "",
+      phone: contact.phone || "",
+      email: contact.email || "",
+      telegram: contact.telegram || "",
+      position: contact.position || "",
+      birthday: contact.birthday || ""
+    });
+    setEditingId(contact.id);
+  };
+
+  const cancel = () => {
+    setMode("view");
+    setFormData(emptyForm);
+    setEditingId(null);
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const saveContact = async () => {
+    if (!formData.name.trim()) {
+      alert("Імʼя обовʼязкове");
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      if (mode === "create") {
+        // 1. Створюємо контакт
+        const contactRes = await api.post("/contacts", formData);
+
+        // 2. Привʼязуємо до клієнта
+        await api.post(`/clients/${client.id}/contacts`, {
+          contactId: contactRes.data.id
+        });
+      }
+
+      if (mode === "edit") {
+        await api.put(`/contacts/${editingId}`, formData);
+      }
+
+      // 3. Оновлюємо клієнта
+      await onRefreshClient();
+
+      cancel();
+    } catch (err) {
+      console.error("Помилка збереження контакту:", err);
+      alert("Не вдалося зберегти контакт");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div style={{ marginTop: "20px" }}>
-      <h3>Contacts Section</h3>
+      <h3>Контакти</h3>
+
       {client?.contacts?.length ? (
         <ul>
           {client.contacts.map((c) => (
-            <li key={c.id}>{c.name} — {c.phone}</li>
+            <li key={c.id}>
+              {c.name} — {c.phone || "—"}{" "}
+              <button onClick={() => startEdit(c)} title="Редагувати">✏️</button>
+            </li>
           ))}
         </ul>
       ) : (
         <p>Контакти відсутні</p>
       )}
+
+      {mode === "view" && (
+        <button onClick={startCreate}>➕ Додати контакт</button>
+      )}
+
+      {(mode === "create" || mode === "edit") && (
+        <div style={{ marginTop: "15px", padding: "10px", border: "1px solid #ccc" }}>
+          <h4>{mode === "create" ? "Новий контакт" : "Редагування контакту"}</h4>
+
+          <input name="name" placeholder="Імʼя" value={formData.name} onChange={handleChange} />
+          <input name="phone" placeholder="Телефон" value={formData.phone} onChange={handleChange} />
+          <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} />
+          <input name="telegram" placeholder="Telegram" value={formData.telegram} onChange={handleChange} />
+          <input name="position" placeholder="Посада" value={formData.position} onChange={handleChange} />
+          <input name="birthday" type="date" value={formData.birthday} onChange={handleChange} />
+
+          <div style={{ marginTop: "10px" }}>
+            <button onClick={saveContact} disabled={saving}>
+              {saving ? "Збереження..." : "Зберегти"}
+            </button>
+            <button onClick={cancel} style={{ marginLeft: "10px" }}>
+              Скасувати
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// ✅ Типізація пропсів
 ContactsSection.propTypes = {
-  client: PropTypes.shape({
-    contacts: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        name: PropTypes.string,
-        phone: PropTypes.string,
-      })
-    ),
-  }),
+  client: PropTypes.object.isRequired,
+  onRefreshClient: PropTypes.func.isRequired
 };
