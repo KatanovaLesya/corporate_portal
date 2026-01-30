@@ -1,7 +1,8 @@
 import { useState } from "react";
 import api from "../../services/api";
 import PropTypes from "prop-types";
-import { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
+
 
 
 const emptyForm = {
@@ -22,9 +23,9 @@ export default function ContactsSection({ client, onRefreshClient }) {
   const copyToClipboard = async (value) => {
   try {
     await navigator.clipboard.writeText(value);
-    alert("Скопійовано");
+    toast.error("Скопійовано");
   } catch (e) {
-    alert("Не вдалося скопіювати");
+    toast.error("Не вдалося скопіювати");
   }
 };
   const formatDate = (date) => {
@@ -69,7 +70,7 @@ export default function ContactsSection({ client, onRefreshClient }) {
     console.log("🟡 raw formData:", formData);
 
     if (!formData.name.trim()) {
-      alert("Імʼя обовʼязкове");
+      toast.error("Імʼя обовʼязкове");
       return;
     }
 
@@ -96,7 +97,7 @@ export default function ContactsSection({ client, onRefreshClient }) {
       cancel();
     } catch (err) {
       console.error("Помилка збереження контакту:", err);
-      alert("Не вдалося зберегти контакт");
+      toast.error("Не вдалося зберегти контакт");
     } finally {
       setSaving(false);
     }
