@@ -79,19 +79,27 @@ export default function ContactsSection({ client, onRefreshClient }) {
     try {
       setSaving(true);
 
-      if (mode === "create") {
-        // 1. Створюємо контакт
-        const contactRes = await api.post("/contacts", formData);
+      const normalizedData = {
+        ...formData,
+        phone: formData.phone || null,
+        email: formData.email || null,
+        telegram: formData.telegram || null,
+        position: formData.position || null,
+        birthday: formData.birthday || null,
+      };
 
-        // 2. Привʼязуємо до клієнта
+      if (mode === "create") {
+        const contactRes = await api.post("/contacts", normalizedData);
+
         await api.post(`/clients/${client.id}/contacts`, {
           contact_id: contactRes.data.id
         });
       }
 
       if (mode === "edit") {
-        await api.put(`/contacts/${editingId}`, formData);
+        await api.put(`/contacts/${editingId}`, normalizedData);
       }
+
 
       // 3. Оновлюємо клієнта
       await onRefreshClient();
