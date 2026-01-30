@@ -11,7 +11,8 @@ const emptyForm = {
   email: "",
   telegram: "",
   position: "",
-  birthday: ""
+  birthday: "",
+  note: ""
 };
 
 export default function ContactsSection({ client, onRefreshClient }) {
@@ -50,7 +51,9 @@ export default function ContactsSection({ client, onRefreshClient }) {
       email: contact.email || "",
       telegram: contact.telegram || "",
       position: contact.position || "",
-      birthday: contact.birthday || ""
+      birthday: contact.birthday || "",
+      note: contact.note || ""
+
     });
     setEditingId(contact.id);
   };
@@ -86,6 +89,8 @@ export default function ContactsSection({ client, onRefreshClient }) {
         telegram: formData.telegram || null,
         position: formData.position || null,
         birthday: formData.birthday || null,
+        note: formData.note || null,
+
       };
 
       if (mode === "create") {
@@ -267,6 +272,13 @@ export default function ContactsSection({ client, onRefreshClient }) {
                   🎂 {formatDate(c.birthday)}
                 </div>
 
+                {c.note && (
+                  <div style={{ marginTop: "4px", fontStyle: "italic", color: "#555" }}>
+                    📝 {c.note}
+                  </div>
+                )}
+
+
                 <button
                   onClick={() => startEdit(c)}
                   title="Редагувати"
@@ -308,6 +320,15 @@ export default function ContactsSection({ client, onRefreshClient }) {
           <input name="telegram" placeholder="Telegram" value={formData.telegram} onChange={handleChange} />
           <input name="position" placeholder="Посада" value={formData.position} onChange={handleChange} />
           <input name="birthday" type="date" value={formData.birthday} onChange={handleChange} />
+          <textarea
+            name="note"
+            placeholder="Примітка (внутрішня)"
+            value={formData.note}
+            onChange={handleChange}
+            rows={3}
+            style={{ width: "100%", marginTop: "6px" }}
+          />
+
 
           <div style={{ marginTop: "10px" }}>
             <button onClick={saveContact} disabled={saving}>
