@@ -19,6 +19,8 @@ export default function ContactsSection({ client, onRefreshClient }) {
   const [formData, setFormData] = useState(emptyForm);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
 
   const copyToClipboard = async (value) => {
   try {
@@ -103,83 +105,186 @@ export default function ContactsSection({ client, onRefreshClient }) {
     }
   };
 
+  const contacts = client?.contacts || [];
+  const primaryContact = contacts[0];
+  const otherContacts = contacts.slice(1);
+
+
   return (
     <div style={{ marginTop: "20px" }}>
       <h3>Контакти</h3>
 
-      {client?.contacts?.length ? (
-        <ul>
-          {client.contacts.map((c) => (
-            <li key={c.id} style={{ marginBottom: "8px" }}>
-              <strong>{c.name}</strong>
+      {contacts.length === 0 && <p>Контакти відсутні</p>}
 
-              {c.position && <> — <em>{c.position}</em></>}
+      {/* 🟢 ПЕРШИЙ КОНТАКТ — ПОВНІСТЮ */}
+      {primaryContact && (
+        <div style={{ marginBottom: "12px" }}>
+          <strong>{primaryContact.name}</strong>
+          {primaryContact.position && <> — <em>{primaryContact.position}</em></>}
 
-              <div style={{ marginTop: "4px" }}>
-                {c.phone && (
-                  <>
-                    📞{" "}
-                    <a href={`tel:${c.phone}`}>{c.phone}</a>
-                    <button
-                      onClick={() => copyToClipboard(c.phone)}
-                      title="Скопіювати телефон"
-                      style={{ marginLeft: "6px" }}
-                    >
-                      📋
-                    </button>
-                  </>
-                )}
-              </div>
+          <div style={{ marginTop: "4px" }}>
+            {primaryContact.phone && (
+              <>
+                📞{" "}
+                <a href={`tel:${primaryContact.phone}`}>{primaryContact.phone}</a>
+                <button
+                  onClick={() => copyToClipboard(primaryContact.phone)}
+                  title="Скопіювати телефон"
+                  style={{ marginLeft: "6px" }}
+                >
+                  📋
+                </button>
+              </>
+            )}
+          </div>
 
-              <div>
-                {c.email && (
-                  <>
-                    ✉️{" "}
-                    <a href={`mailto:${c.email}`}>{c.email}</a>
-                    <button
-                      onClick={() => copyToClipboard(c.email)}
-                      title="Скопіювати email"
-                      style={{ marginLeft: "6px" }}
-                    >
-                      📋
-                    </button>
-                  </>
-                )}
-              </div>
+          <div>
+            {primaryContact.email && (
+              <>
+                ✉️{" "}
+                <a href={`mailto:${primaryContact.email}`}>{primaryContact.email}</a>
+                <button
+                  onClick={() => copyToClipboard(primaryContact.email)}
+                  title="Скопіювати email"
+                  style={{ marginLeft: "6px" }}
+                >
+                  📋
+                </button>
+              </>
+            )}
+          </div>
 
-              <div>
-                {c.telegram && (
-                  <>
-                    ✈️{" "}
-                    <a
-                      href={`https://t.me/${c.telegram.replace("@", "")}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {c.telegram}
-                    </a>
-                  </>
-                )}
-              </div>
+          <div>
+            {primaryContact.telegram && (
+              <>
+                ✈️{" "}
+                <a
+                  href={`https://t.me/${primaryContact.telegram.replace("@", "")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {primaryContact.telegram}
+                </a>
+              </>
+            )}
+          </div>
 
-              <div>
-                🎂 {formatDate(c.birthday)}
-              </div>
+          <div>
+            🎂 {formatDate(primaryContact.birthday)}
+          </div>
 
-              <button
-                onClick={() => startEdit(c)}
-                title="Редагувати"
-                style={{ marginTop: "4px" }}
-              >
-                ✏️
-              </button>
-            </li>
-
-          ))}
-        </ul>
-      ) : (
-        <p>Контакти відсутні</p>
+          <button
+            onClick={() => startEdit(primaryContact)}
+            title="Редагувати"
+            style={{ marginTop: "4px" }}
+          >
+            ✏️
+          </button>
+        </div>
       )}
+
+      {/* 🔽 КНОПКА "ЩЕ N КОНТАКТІВ" */}
+      {otherContacts.length > 0 && !expanded && (
+        <button
+          onClick={() => setExpanded(true)}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#2563eb",
+            cursor: "pointer",
+            padding: 0
+          }}
+        >
+          ▸ ще {otherContacts.length} контакт{otherContacts.length > 1 ? "и" : ""}
+        </button>
+      )}
+
+      {/* 🔼 РОЗГОРНУТІ КОНТАКТИ */}
+      {expanded && (
+        <>
+          <ul style={{ listStyle: "none", padding: 0, marginTop: "10px" }}>
+            {otherContacts.map((c) => (
+              <li key={c.id} style={{ marginBottom: "8px" }}>
+                <strong>{c.name}</strong>
+                {c.position && <> — <em>{c.position}</em></>}
+
+                <div>
+                  {c.phone && (
+                    <>
+                      📞{" "}
+                      <a href={`tel:${c.phone}`}>{c.phone}</a>
+                      <button
+                        onClick={() => copyToClipboard(c.phone)}
+                        title="Скопіювати телефон"
+                        style={{ marginLeft: "6px" }}
+                      >
+                        📋
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                <div>
+                  {c.email && (
+                    <>
+                      ✉️{" "}
+                      <a href={`mailto:${c.email}`}>{c.email}</a>
+                      <button
+                        onClick={() => copyToClipboard(c.email)}
+                        title="Скопіювати email"
+                        style={{ marginLeft: "6px" }}
+                      >
+                        📋
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                <div>
+                  {c.telegram && (
+                    <>
+                      ✈️{" "}
+                      <a
+                        href={`https://t.me/${c.telegram.replace("@", "")}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {c.telegram}
+                      </a>
+                    </>
+                  )}
+                </div>
+
+                <div>
+                  🎂 {formatDate(c.birthday)}
+                </div>
+
+                <button
+                  onClick={() => startEdit(c)}
+                  title="Редагувати"
+                  style={{ marginTop: "4px" }}
+                >
+                  ✏️
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            onClick={() => setExpanded(false)}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#2563eb",
+              cursor: "pointer",
+              padding: 0
+            }}
+          >
+            ▾ згорнути
+          </button>
+        </>
+      )}
+
 
       {mode === "view" && (
         <button onClick={startCreate}>➕ Додати контакт</button>
