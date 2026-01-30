@@ -47,6 +47,11 @@ export default function ContactsSection({ client, onRefreshClient }) {
   };
 
   const saveContact = async () => {
+
+    console.log("🟡 saveContact → mode:", mode);
+    console.log("🟡 client.id:", client.id);
+    console.log("🟡 raw formData:", formData);
+
     if (!formData.name.trim()) {
       alert("Імʼя обовʼязкове");
       return;
