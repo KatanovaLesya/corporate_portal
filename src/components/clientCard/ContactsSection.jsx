@@ -17,6 +17,20 @@ export default function ContactsSection({ client, onRefreshClient }) {
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
 
+  const copyToClipboard = async (value) => {
+  try {
+    await navigator.clipboard.writeText(value);
+    alert("Скопійовано");
+  } catch (e) {
+    alert("Не вдалося скопіювати");
+  }
+};
+  const formatDate = (date) => {
+    if (!date) return "—";
+    return new Date(date).toLocaleDateString("uk-UA");
+  };
+
+
   const startCreate = () => {
     setMode("create");
     setFormData(emptyForm);
@@ -93,10 +107,71 @@ export default function ContactsSection({ client, onRefreshClient }) {
       {client?.contacts?.length ? (
         <ul>
           {client.contacts.map((c) => (
-            <li key={c.id}>
-              {c.name} — {c.phone || "—"}{" "}
-              <button onClick={() => startEdit(c)} title="Редагувати">✏️</button>
+            <li key={c.id} style={{ marginBottom: "8px" }}>
+              <strong>{c.name}</strong>
+
+              {c.position && <> — <em>{c.position}</em></>}
+
+              <div style={{ marginTop: "4px" }}>
+                {c.phone && (
+                  <>
+                    📞{" "}
+                    <a href={`tel:${c.phone}`}>{c.phone}</a>
+                    <button
+                      onClick={() => copyToClipboard(c.phone)}
+                      title="Скопіювати телефон"
+                      style={{ marginLeft: "6px" }}
+                    >
+                      📋
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div>
+                {c.email && (
+                  <>
+                    ✉️{" "}
+                    <a href={`mailto:${c.email}`}>{c.email}</a>
+                    <button
+                      onClick={() => copyToClipboard(c.email)}
+                      title="Скопіювати email"
+                      style={{ marginLeft: "6px" }}
+                    >
+                      📋
+                    </button>
+                  </>
+                )}
+              </div>
+
+              <div>
+                {c.telegram && (
+                  <>
+                    ✈️{" "}
+                    <a
+                      href={`https://t.me/${c.telegram.replace("@", "")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {c.telegram}
+                    </a>
+                  </>
+                )}
+              </div>
+
+              <div>
+                🎂 {formatDate(c.birthday)}
+              </div>
+
+              <button
+                onClick={() => startEdit(c)}
+                title="Редагувати"
+                style={{ marginTop: "4px" }}
+              >
+                ✏️
+              </button>
             </li>
+
           ))}
         </ul>
       ) : (
